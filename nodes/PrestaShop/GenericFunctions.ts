@@ -9,7 +9,6 @@ import type {
 	IHttpRequestMethods,
 	IHttpRequestOptions,
 	IPollFunctions,
-	INodePropertyOptions,
 } from 'n8n-workflow';
 import { NodeApiError } from 'n8n-workflow';
 
@@ -879,46 +878,26 @@ export function getOrderFields() {
 	];
 }
 
-let cachedLanguages: INodePropertyOptions[] | null = null;
-export async function getLanguages(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-	if (cachedLanguages) {
-		return cachedLanguages;
-	}
-
-	//https://devdocs.prestashop-project.org/9/webservice/resources/languages/
-	const response = await prestashopApiRequest.call(
-		this,
-		'GET',
-		'languages',
-		{},
-		'display=full',
-	);
-	const languages = response['languages'] || [];
-	const returnData: INodePropertyOptions[] = [];
-	for (const lang of languages) {
-		returnData.push({
-			name: lang.name,
-			value: lang.id,
-		});
-	}
-	returnData.sort(sort);
-
-	cachedLanguages = returnData;
-
-	return returnData;
-}
-
+let cachedDefaultLanguage: string = '';
 export async function getDefaultLanguage(this: ILoadOptionsFunctions): Promise<string> {
+	if (cachedDefaultLanguage) {
+		return cachedDefaultLanguage;
+	}
+
 	//https://devdocs.prestashop-project.org/9/webservice/resources/configurations/
-	const languageConfigurations = await prestashopApiRequest.call(
+	const response = await prestashopApiRequest.call(
 		this,
 		'GET',
 		'/configurations',
 		{},
 		'filter[name]=[PS_LANG_DEFAULT]&display=full',
 	);
-	for (const lang of languageConfigurations) {
-		return lang.value;
+	
+	const languageConfigurations = response['configurations'] || [];
+	for (const conf of languageConfigurations) {
+		cachedDefaultLanguage = conf.value;
+
+		return conf.value;
 	}
 	return '';
 }

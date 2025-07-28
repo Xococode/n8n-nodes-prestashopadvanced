@@ -79,6 +79,9 @@ export const productFields: INodeProperties[] = [
 		type: 'fixedCollection',
 		placeholder: 'Add translations',
 		default: {},
+		typeOptions: {
+			multipleValues: true,
+		},
 		options: [
 			{
 				displayName: 'Translations',
@@ -116,10 +119,15 @@ export const productFields: INodeProperties[] = [
 		type: 'fixedCollection',
 		placeholder: 'Add translations',
 		default: {},
+		typeOptions: {
+			multipleValues: true,
+		},
 		options: [
 			{
 				displayName: 'Translations',
 				name: 'translations',
+				placeholder: 'Add translation',
+				default: {},
 				values: [
 					{
 						displayName: 'Language',

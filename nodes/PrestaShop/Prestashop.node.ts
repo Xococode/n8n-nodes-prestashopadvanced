@@ -26,6 +26,8 @@ import type {
 	SortOrder,
 } from './types';
 
+let cachedLanguages: INodePropertyOptions[] | null = null;
+
 export class Prestashop implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'PrestaShop',
@@ -97,6 +99,33 @@ export class Prestashop implements INodeType {
 
 	methods = {
 		loadOptions: {
+			async getLanguages(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				if (cachedLanguages) {
+					return cachedLanguages;
+				}
+
+				//https://devdocs.prestashop-project.org/9/webservice/resources/languages/
+				const response = await prestashopApiRequest.call(
+					this,
+					'GET',
+					'languages',
+					{},
+					'display=full',
+				);
+				const languages = response['languages'] || [];
+				const returnData: INodePropertyOptions[] = [];
+				for (const lang of languages) {
+					returnData.push({
+						name: lang.name,
+						value: lang.id,
+					});
+				}
+				returnData.sort(sort);
+
+				cachedLanguages = returnData;
+
+				return returnData;
+			},
 			async getGroups(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
 				//https://devdocs.prestashop-project.org/9/webservice/resources/groups/
 				const language = await getDefaultLanguage.call(this);
@@ -144,7 +173,7 @@ export class Prestashop implements INodeType {
 					'GET',
 					'categories',
 					{},
-					'language=' + language + 'display=full',
+					'language=' + language + '&display=full',
 				);
 				const categories = response['categories'] || [];
 				const returnData: INodePropertyOptions[] = [];
@@ -158,14 +187,14 @@ export class Prestashop implements INodeType {
 				return returnData;
 			},
 			async getOrderStates(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-				// https://devdocs.prestashop-project.org/9/webservice/resources/categories/
+				// https://devdocs.prestashop-project.org/9/webservice/resources/order_states/
 				const language = await getDefaultLanguage.call(this);
 				const response = await prestashopApiRequest.call(
 					this,
 					'GET',
 					'order_states',
 					{},
-					'language=' + language + 'display=full',
+					'language=' + language + '&display=full',
 				);
 				const order_states = response['order_states'] || [];
 				const returnData: INodePropertyOptions[] = [];
@@ -536,14 +565,14 @@ export class Prestashop implements INodeType {
 				if (resource === 'product') {
 					if (operation === 'create') {
 						const nameTranslations = this.getNodeParameter('name', i) as { translations: { id: string; value: string }[] };
-						const linkRewriteTranslations = this.getNodeParameter('name', i) as { translations: { id: string; value: string }[] };
+						const linkRewriteTranslations = this.getNodeParameter('linkRewrite', i) as { translations: { id: string; value: string }[] };
 						const price = this.getNodeParameter('price', i) as number;
 						const additionalFields = this.getNodeParameter('additionalFields', i);
 
 						const productData = {
 							name: nameTranslations,
 							link_rewrite: linkRewriteTranslations,
-							price,
+							price: price,
 						};
 						Object.assign(productData, additionalFields);
 
@@ -551,26 +580,26 @@ export class Prestashop implements INodeType {
 							<prestashop>
 								<product>
 									${Object.entries(productData)
-										.map(([key, value]) => {
-											if (value && typeof value === 'object' && (value as IDataObject).translations) {
+										.map(([key, fieldValue]) => {
+											if (fieldValue && typeof fieldValue === 'object' && Array.isArray((fieldValue as any).translations)) {
 												// multilang field
-												const translations = (value as IDataObject).translations as { idLang: string; valueLang: string }[];
+												const translations = (fieldValue as any).translations as { id: string; value: string }[];
 												return `<${key}>${translations
-													.map(({ idLang, valueLang }) => {
-														return `<lang id="${idLang}"><![CDATA[${valueLang}]]</lang>`
+													.map(({ id, value }) => {
+														return `<language id="${id}"><![CDATA[${value}]]></language>`
 													})
 													.join('')
 												}</${key}>`;
-											} else if (typeof value === 'boolean') {
+											} else if (typeof fieldValue === 'boolean') {
 												// boolean field
-												return `<${key}>${(value ? '1' : '0')}</${key}>`;
+												return `<${key}>${(fieldValue ? '1' : '0')}</${key}>`;
 											} 
-											return `<${key}>${value}</${key}>`;
+											return `<${key}>${fieldValue}</${key}>`;
 										})
 										.join('\n')}
 								</product>
 							</prestashop>`;
-
+											
 						responseData = await prestashopApiRequest.call(
 							this,
 							'POST',
@@ -627,14 +656,16 @@ export class Prestashop implements INodeType {
 
 					if (operation === 'update') {
 						const productId = this.getNodeParameter('productId', i) as string;
-						const name = this.getNodeParameter('name', i) as string;
+						const nameTranslations = this.getNodeParameter('name', i) as { translations: { id: string; value: string }[] };
+						const linkRewriteTranslations = this.getNodeParameter('linkRewrite', i) as { translations: { id: string; value: string }[] };
 						const price = this.getNodeParameter('price', i) as number;
 						const additionalFields = this.getNodeParameter('additionalFields', i);
 
 						const productData = {
 							id: productId,
-							name,
-							price,
+							name: nameTranslations,
+							link_rewrite: linkRewriteTranslations,
+							price: price,
 						};
 						Object.assign(productData, additionalFields);
 
@@ -643,9 +674,19 @@ export class Prestashop implements INodeType {
 								<product>
 									${Object.entries(productData)
 										.map(([key, value]) => {
-											if (typeof value === 'boolean') {
-												value = value ? '1' : '0';
-											}
+											if (value && typeof value === 'object' && (value as IDataObject).translations) {
+												// multilang field
+												const translations = (value as IDataObject).translations as { id: string; value: string }[];
+												return `<${key}>${translations
+													.map(({ id, value }) => {
+														return `<language id="${id}"><![CDATA[${value}]]></language>`
+													})
+													.join('')
+												}</${key}>`;
+											} else if (typeof value === 'boolean') {
+												// boolean field
+												return `<${key}>${(value ? '1' : '0')}</${key}>`;
+											} 
 											return `<${key}>${value}</${key}>`;
 										})
 										.join('\n')}

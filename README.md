@@ -29,7 +29,9 @@ Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes
 #### Orders
 - Get an order
 - Get all orders
-- Update order state
+- Delete an order
+- Change order state
+- Set order shipping number
 
 #### Products
 - Create a product
@@ -53,7 +55,7 @@ You need a **PrestaShop API Key** and the **base URL** of your store.
 
 ## Compatibility
 
-- Minimum n8n version: **0.200.0**
+- Minimum n8n version: **1.0.0**
 - Tested with:
   - PrestaShop **1.7.x**
   - PrestaShop **8.x**

@@ -77,7 +77,9 @@ export const orderFields: INodeProperties[] = [
 		displayName: 'Order State ID',
 		name: 'orderStateId',
 		type: 'options',
-		typeOptions: { loadOptionsMethod: 'getOrderStates' },
+		typeOptions: {
+			loadOptionsMethod: 'getOrderStates'
+		},
 		required: true,
 		default: '',
 		displayOptions: {
