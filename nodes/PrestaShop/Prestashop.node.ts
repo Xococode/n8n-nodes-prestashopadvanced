@@ -1,4 +1,5 @@
 import { capitalCase } from 'change-case';
+import { XMLBuilder } from 'fast-xml-parser';
 import {
 	IExecuteFunctions,
 	IDataObject,
@@ -17,6 +18,7 @@ import {
 	prestashopApiRequest,
 	sort,
 	getProductFields,
+	buildMultilangField,
 } from './GenericFunctions';
 import { customerFields, customerOperations } from './CustomerDescription';
 import { orderFields, orderOperations } from './OrderDescription';
@@ -24,6 +26,7 @@ import { productFields, productOperations } from './ProductDescription';
 import type {
 	Filter,
 	SortOrder,
+	Translation,
 } from './types';
 
 let cachedLanguages: INodePropertyOptions[] | null = null;
@@ -280,28 +283,36 @@ export class Prestashop implements INodeType {
 						const email = this.getNodeParameter('email', i) as string;
 						const firstname = this.getNodeParameter('firstname', i) as string;
 						const lastname = this.getNodeParameter('lastname', i) as string;
+						const passwd = this.getNodeParameter('passwd', i) as string;
 						const additionalFields = this.getNodeParameter('additionalFields', i);
 
-						const customerData = {
-							email: email,
-							firstname: firstname,
-							lastname: lastname,
-						};
+						const response = await prestashopApiRequest.call(
+							this,
+							'GET',
+							`customers`,
+							{},
+							'schema=blank',
+						);
+						
+						const customerData = response.customer || {};
+
+						if (email) customerData.email = email;
+						if (firstname) customerData.firstname = firstname;
+						if (lastname) customerData.lastname = lastname;
+						if (passwd) customerData.passwd = passwd;
 						Object.assign(customerData, additionalFields);
 
-						const body = `<?xml version="1.0" encoding="UTF-8"?>
-							<prestashop>
-						  		<customer>
-									${Object.entries(customerData)
-										.map(([key, value]) => {
-											if (typeof value === 'boolean') {
-												value = value ? '1' : '0';
-											}
-											return `<${key}>${value}</${key}>`
-										})
-										.join('\n')}
-							  	</customer>
-							</prestashop>`;
+						['associations', 'date_add', 'date_upd'].forEach((prop) => delete customerData[prop]);
+
+						for (const key of Object.keys(customerData)) {
+							if (typeof customerData[key] === 'boolean') {
+								customerData[key] = customerData[key] ? '1' : '0';
+							}
+						}
+
+						const builder = new XMLBuilder({ ignoreAttributes: false });
+						const body = `<?xml version="1.0" encoding="UTF-8"?>\n` +
+							builder.build({ prestashop: { customer: customerData } });
 
 						responseData = await prestashopApiRequest.call(
 							this,
@@ -362,33 +373,30 @@ export class Prestashop implements INodeType {
 						const email = this.getNodeParameter('email', i) as string;
 						const firstname = this.getNodeParameter('firstname', i) as string;
 						const lastname = this.getNodeParameter('lastname', i) as string;
+						const passwd = this.getNodeParameter('passwd', i) as string;
 						const additionalFields = this.getNodeParameter('additionalFields', i);
 
-						const customerData = {
-							id: customerId,
-							email: email,
-							firstname: firstname,
-							lastname: lastname,
-						};
+						const customerData: IDataObject = {};
+						customerData.id = customerId;
+						if (email) customerData.email = email;
+						if (firstname) customerData.firstname = firstname;
+						if (lastname) customerData.lastname = lastname;
+						if (passwd) customerData.passwd = passwd;
 						Object.assign(customerData, additionalFields);
 
-						const body = `<?xml version="1.0" encoding="UTF-8"?>
-							<prestashop>
-						  		<customer>
-									${Object.entries(customerData)
-										.map(([key, value]) => {
-											if (typeof value === 'boolean') {
-												value = value ? '1' : '0';
-											}
-											return `<${key}>${value}</${key}>`
-										})
-										.join('\n')}
-							  	</customer>
-							</prestashop>`;
+						for (const key of Object.keys(customerData)) {
+							if (typeof customerData[key] === 'boolean') {
+								customerData[key] = customerData[key] ? '1' : '0';
+							}
+						}
+
+						const builder = new XMLBuilder({ ignoreAttributes: false });
+						const body = `<?xml version="1.0" encoding="UTF-8"?>\n` +
+							builder.build({ prestashop: { customer: customerData } });
 
 						responseData = await prestashopApiRequest.call(
 							this,
-							'PUT',
+							'PATCH',
 							`customers/${customerId}`,
 							body
 						);
@@ -445,58 +453,18 @@ export class Prestashop implements INodeType {
 					if (operation === 'changeStatus') {
 						const orderId = this.getNodeParameter('orderId', i) as string;
 						const orderStateId = this.getNodeParameter('orderStateId', i) as string;
-						const idAddressDelivery = this.getNodeParameter('id_address_delivery', i) as string;
-						const idAddressInvoice = this.getNodeParameter('id_address_invoice', i) as string;
-						const idCart = this.getNodeParameter('id_cart', i) as string;
-						const idCurrency = this.getNodeParameter('id_currency', i) as string;
-						const idLang = this.getNodeParameter('id_lang', i) as string;
-						const idCustomer = this.getNodeParameter('id_customer', i) as string;
-						const idCarrier = this.getNodeParameter('id_carrier', i) as string;
-						const payment = this.getNodeParameter('payment', i) as string;
-						const module = this.getNodeParameter('module', i) as string;
-						const totalPaid = this.getNodeParameter('total_paid', i) as string;
-						const totalPaidReal = this.getNodeParameter('total_paid_real', i) as string;
-						const totalProducts = this.getNodeParameter('total_products', i) as string;
-						const totalProductsWt = this.getNodeParameter('total_products_wt', i) as string;
-						const conversionRate = this.getNodeParameter('conversion_rate', i) as string;
 
+						const orderData: IDataObject = {};
+						orderData.id = orderId;
+						orderData.current_state = orderStateId;
 
-						const orderData = {
-							id: orderId,
-							current_state: orderStateId,
-							id_address_delivery: idAddressDelivery,
-							id_address_invoice: idAddressInvoice,
-							id_cart: idCart,
-							id_currency: idCurrency,
-							id_lang: idLang,
-							id_customer: idCustomer,
-							id_carrier: idCarrier,
-							payment,
-							module,
-							total_paid: totalPaid,
-							total_paid_real: totalPaidReal,
-							total_products: totalProducts,
-							total_products_wt: totalProductsWt,
-							conversion_rate: conversionRate,
-						};
-
-						const body = `<?xml version="1.0" encoding="UTF-8"?>
-							<prestashop>
-								<order>
-									${Object.entries(orderData)
-										.map(([key, value]) => {
-											if (typeof value === 'boolean') {
-												value = value ? '1' : '0';
-											}
-											return `<${key}>${value}</${key}>`;
-										})
-										.join('\n')}
-								</order>
-							</prestashop>`;
+						const builder = new XMLBuilder({ ignoreAttributes: false });
+						const body = `<?xml version="1.0" encoding="UTF-8"?>\n` +
+							builder.build({ prestashop: { order: orderData } });
 
 						responseData = await prestashopApiRequest.call(
 							this,
-							'PUT',
+							'PATCH',
 							`orders/${orderId}`,
 							body,
 						);
@@ -505,57 +473,18 @@ export class Prestashop implements INodeType {
 					if (operation === 'shippingNumber') {
 						const orderId = this.getNodeParameter('orderId', i) as string;
 						const orderShippingNumber = this.getNodeParameter('orderShippingNumber', i) as string;
-						const idAddressDelivery = this.getNodeParameter('id_address_delivery', i) as string;
-						const idAddressInvoice = this.getNodeParameter('id_address_invoice', i) as string;
-						const idCart = this.getNodeParameter('id_cart', i) as string;
-						const idCurrency = this.getNodeParameter('id_currency', i) as string;
-						const idLang = this.getNodeParameter('id_lang', i) as string;
-						const idCustomer = this.getNodeParameter('id_customer', i) as string;
-						const idCarrier = this.getNodeParameter('id_carrier', i) as string;
-						const payment = this.getNodeParameter('payment', i) as string;
-						const module = this.getNodeParameter('module', i) as string;
-						const totalPaid = this.getNodeParameter('total_paid', i) as string;
-						const totalPaidReal = this.getNodeParameter('total_paid_real', i) as string;
-						const totalProducts = this.getNodeParameter('total_products', i) as string;
-						const totalProductsWt = this.getNodeParameter('total_products_wt', i) as string;
-						const conversionRate = this.getNodeParameter('conversion_rate', i) as string;
+						
+						const orderData: IDataObject = {};
+						orderData.id = orderId;
+						orderData.shipping_number = orderShippingNumber;
 
-						const orderData = {
-							id: orderId,
-							shipping_number: orderShippingNumber,
-							id_address_delivery: idAddressDelivery,
-							id_address_invoice: idAddressInvoice,
-							id_cart: idCart,
-							id_currency: idCurrency,
-							id_lang: idLang,
-							id_customer: idCustomer,
-							id_carrier: idCarrier,
-							payment,
-							module,
-							total_paid: totalPaid,
-							total_paid_real: totalPaidReal,
-							total_products: totalProducts,
-							total_products_wt: totalProductsWt,
-							conversion_rate: conversionRate,
-						};
-
-						const body = `<?xml version="1.0" encoding="UTF-8"?>
-							<prestashop>
-								<order>
-									${Object.entries(orderData)
-										.map(([key, value]) => {
-											if (typeof value === 'boolean') {
-												value = value ? '1' : '0';
-											}
-											return `<${key}>${value}</${key}>`;
-										})
-										.join('\n')}
-								</order>
-							</prestashop>`;
+						const builder = new XMLBuilder({ ignoreAttributes: false });
+						const body = `<?xml version="1.0" encoding="UTF-8"?>\n` +
+							builder.build({ prestashop: { order: orderData } });
 
 						responseData = await prestashopApiRequest.call(
 							this,
-							'PUT',
+							'PATCH',
 							`orders/${orderId}`,
 							body,
 						);
@@ -564,42 +493,47 @@ export class Prestashop implements INodeType {
 
 				if (resource === 'product') {
 					if (operation === 'create') {
-						const nameTranslations = this.getNodeParameter('name', i) as { translations: { id: string; value: string }[] };
-						const linkRewriteTranslations = this.getNodeParameter('linkRewrite', i) as { translations: { id: string; value: string }[] };
+						const nameTranslations = this.getNodeParameter('name', i) as { translations: Translation[] };
+						const linkRewriteTranslations = this.getNodeParameter('linkRewrite', i) as { translations: Translation[] };
 						const price = this.getNodeParameter('price', i) as number;
 						const additionalFields = this.getNodeParameter('additionalFields', i);
 
-						const productData = {
-							name: nameTranslations,
-							link_rewrite: linkRewriteTranslations,
-							price: price,
-						};
+						const response = await prestashopApiRequest.call(
+							this,
+							'GET',
+							`products`,
+							{},
+							'schema=blank',
+						);
+						
+						const productData = response.product || {};
+						
+						productData.name = { language: buildMultilangField(nameTranslations) };
+						productData.link_rewrite = { language: buildMultilangField(linkRewriteTranslations) };
+						productData.price = price;
+						productData.state = 1;
 						Object.assign(productData, additionalFields);
 
-						const body = `<?xml version="1.0" encoding="UTF-8"?>
-							<prestashop>
-								<product>
-									${Object.entries(productData)
-										.map(([key, fieldValue]) => {
-											if (fieldValue && typeof fieldValue === 'object' && Array.isArray((fieldValue as any).translations)) {
-												// multilang field
-												const translations = (fieldValue as any).translations as { id: string; value: string }[];
-												return `<${key}>${translations
-													.map(({ id, value }) => {
-														return `<language id="${id}"><![CDATA[${value}]]></language>`
-													})
-													.join('')
-												}</${key}>`;
-											} else if (typeof fieldValue === 'boolean') {
-												// boolean field
-												return `<${key}>${(fieldValue ? '1' : '0')}</${key}>`;
-											} 
-											return `<${key}>${fieldValue}</${key}>`;
-										})
-										.join('\n')}
-								</product>
-							</prestashop>`;
-											
+						[
+							'associations',
+							'date_add',
+							'date_upd',
+							'cache_default_attribute',
+							'supplier_reference',
+							'location',
+							'quantity_discount'
+						].forEach((prop) => delete productData[prop]);
+
+						for (const key of Object.keys(productData)) {
+							if (typeof productData[key] === 'boolean') {
+								productData[key] = productData[key] ? '1' : '0';
+							}
+						}
+
+						const builder = new XMLBuilder({ ignoreAttributes: false, cdataPropName: '__cdata' });
+						const body = `<?xml version="1.0" encoding="UTF-8"?>\n` +
+							builder.build({ prestashop: { product: productData } });
+
 						responseData = await prestashopApiRequest.call(
 							this,
 							'POST',
@@ -656,46 +590,31 @@ export class Prestashop implements INodeType {
 
 					if (operation === 'update') {
 						const productId = this.getNodeParameter('productId', i) as string;
-						const nameTranslations = this.getNodeParameter('name', i) as { translations: { id: string; value: string }[] };
-						const linkRewriteTranslations = this.getNodeParameter('linkRewrite', i) as { translations: { id: string; value: string }[] };
+						const nameTranslations = this.getNodeParameter('name', i) as { translations: Translation[] };
+						const linkRewriteTranslations = this.getNodeParameter('linkRewrite', i) as { translations: Translation[] };
 						const price = this.getNodeParameter('price', i) as number;
 						const additionalFields = this.getNodeParameter('additionalFields', i);
 
-						const productData = {
-							id: productId,
-							name: nameTranslations,
-							link_rewrite: linkRewriteTranslations,
-							price: price,
-						};
+						const productData:IDataObject = {};
+						productData.id = productId;
+						if (nameTranslations && Array.isArray(nameTranslations.translations)) productData.name = { language: buildMultilangField(nameTranslations) };
+						if (linkRewriteTranslations && Array.isArray(linkRewriteTranslations.translations)) productData.link_rewrite = { language: buildMultilangField(linkRewriteTranslations) };
+						if (price) productData.price = price;
 						Object.assign(productData, additionalFields);
 
-						const body = `<?xml version="1.0" encoding="UTF-8"?>
-							<prestashop>
-								<product>
-									${Object.entries(productData)
-										.map(([key, value]) => {
-											if (value && typeof value === 'object' && (value as IDataObject).translations) {
-												// multilang field
-												const translations = (value as IDataObject).translations as { id: string; value: string }[];
-												return `<${key}>${translations
-													.map(({ id, value }) => {
-														return `<language id="${id}"><![CDATA[${value}]]></language>`
-													})
-													.join('')
-												}</${key}>`;
-											} else if (typeof value === 'boolean') {
-												// boolean field
-												return `<${key}>${(value ? '1' : '0')}</${key}>`;
-											} 
-											return `<${key}>${value}</${key}>`;
-										})
-										.join('\n')}
-								</product>
-							</prestashop>`;
+						for (const key of Object.keys(productData)) {
+							if (typeof productData[key] === 'boolean') {
+								productData[key] = productData[key] ? '1' : '0';
+							}
+						}
+
+						const builder = new XMLBuilder({ ignoreAttributes: false, cdataPropName: '__cdata' });
+						const body = `<?xml version="1.0" encoding="UTF-8"?>\n` +
+							builder.build({ prestashop: { product: productData } });
 
 						responseData = await prestashopApiRequest.call(
 							this,
-							'PUT',
+							'PATCH',
 							`products/${productId}`,
 							body
 						);

@@ -71,7 +71,6 @@ export const customerFields: INodeProperties[] = [
 
 	/* -------------------------------------------------------------------------- */
 	/*                                   customer:create                          */
-	/*                                   customer:update                          */
 	/* -------------------------------------------------------------------------- */
 	{
 		displayName: 'Email',
@@ -83,7 +82,7 @@ export const customerFields: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['customer'],
-				operation: ['create', 'update'],
+				operation: ['create'],
 			},
 		},
 	},
@@ -96,7 +95,7 @@ export const customerFields: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['customer'],
-				operation: ['create', 'update'],
+				operation: ['create'],
 			},
 		},
 	},
@@ -109,7 +108,7 @@ export const customerFields: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['customer'],
-				operation: ['create', 'update'],
+				operation: ['create'],
 			},
 		},
 	},
@@ -123,10 +122,69 @@ export const customerFields: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['customer'],
-				operation: ['create', 'update'],
+				operation: ['create'],
 			},
 		},
 	},
+
+	/* -------------------------------------------------------------------------- */
+	/*                                   customer:update                          */
+	/* -------------------------------------------------------------------------- */
+	{
+		displayName: 'Email',
+		name: 'email',
+		type: 'string',
+		placeholder: 'name@email.com',
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['customer'],
+				operation: ['update'],
+			},
+		},
+	},
+	{
+		displayName: 'First Name',
+		name: 'firstname',
+		type: 'string',
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['customer'],
+				operation: ['update'],
+			},
+		},
+	},
+	{
+		displayName: 'Last Name',
+		name: 'lastname',
+		type: 'string',
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['customer'],
+				operation: ['update'],
+			},
+		},
+	},
+	{
+		displayName: 'Password',
+		name: 'passwd',
+		type: 'string',
+		default: '',
+		typeOptions: { password: true },
+		displayOptions: {
+			show: {
+				resource: ['customer'],
+				operation: ['update'],
+			},
+		},
+	},
+
+	/* -------------------------------------------------------------------------- */
+	/*                                   customer:create                          */
+	/*                                   customer:update                          */
+	/* -------------------------------------------------------------------------- */
 	{
 		displayName: 'Additional Fields',
 		name: 'additionalFields',

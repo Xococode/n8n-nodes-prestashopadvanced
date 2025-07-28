@@ -53,6 +53,7 @@
   },
   "peerDependencies": {
     "change-case": "*",
+    "fast-xml-parser": "*",
     "n8n-workflow": "*"
   }
 }

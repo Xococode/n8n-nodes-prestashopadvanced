@@ -37,19 +37,103 @@ export class PrestashopTrigger implements INodeType {
 				noDataExpression: true,
 				default: 'customers.created',
 				options: [
-					{
-						name: 'Customer Created',
-						value: 'customers.created',
-					},
-					{
-						name: 'Order Created',
-						value: 'orders.created',
-					},
-					{
-						name: 'Product Created',
-						value: 'products.created',
-					},
-				],
+				{
+					name: 'Address Created',
+					value: 'addresses.created',
+				},
+				{
+					name: 'Carrier Created',
+					value: 'carriers.created',
+				},
+				{
+					name: 'Cart Rule Created',
+					value: 'cart_rules.created',
+				},
+				{
+					name: 'Cart Created',
+					value: 'carts.created',
+				},
+				{
+					name: 'Category Created',
+					value: 'categories.created',
+				},
+				{
+					name: 'Combination Created',
+					value: 'combinations.created',
+				},
+				{
+					name: 'Customer Message Created',
+					value: 'customer_messages.created',
+				},
+				{
+					name: 'Customer Thread Created',
+					value: 'customer_threads.created',
+				},
+				{
+					name: 'Customer Created',
+					value: 'customers.created',
+				},
+				{
+					name: 'Employee Created',
+					value: 'employees.created',
+				},
+				{
+					name: 'Manufacturer Created',
+					value: 'manufacturers.created',
+				},
+				{
+					name: 'Message Created',
+					value: 'messages.created',
+				},
+				{
+					name: 'Order Carrier Created',
+					value: 'order_carriers.created',
+				},
+				{
+					name: 'Order Detail Created',
+					value: 'order_details.created',
+				},
+				{
+					name: 'Order History Created',
+					value: 'order_histories.created',
+				},
+				{
+					name: 'Order Payment Created',
+					value: 'order_payments.created',
+				},
+				{
+					name: 'Order Created',
+					value: 'orders.created',
+				},
+				{
+					name: 'Product Created',
+					value: 'products.created',
+				},
+				{
+					name: 'Specific Price Rule Created',
+					value: 'specific_price_rules.created',
+				},
+				{
+					name: 'Specific Price Created',
+					value: 'specific_prices.created',
+				},
+				{
+					name: 'Stock Available Created',
+					value: 'stock_availables.created',
+				},
+				{
+					name: 'Store Created',
+					value: 'stores.created',
+				},
+				{
+					name: 'Supplier Created',
+					value: 'suppliers.created',
+				},
+				{
+					name: 'Tag Created',
+					value: 'tags.created',
+				},
+			]
 			},
 			{
 				displayName: 'Starting ID',

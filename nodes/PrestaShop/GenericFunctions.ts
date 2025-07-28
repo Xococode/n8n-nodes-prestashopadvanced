@@ -1,4 +1,4 @@
-import type {
+import {
 	IDataObject,
 	IExecuteFunctions,
 	IHookFunctions,
@@ -9,12 +9,12 @@ import type {
 	IHttpRequestMethods,
 	IHttpRequestOptions,
 	IPollFunctions,
+	NodeApiError,
 } from 'n8n-workflow';
-import { NodeApiError } from 'n8n-workflow';
-
 import type { 
 	Filter,
 	SortOrder,
+	Translation,
 } from './types';
 
 export async function prestashopApiRequest(
@@ -30,13 +30,17 @@ export async function prestashopApiRequest(
 ): Promise<any> {
 	const credentials = await this.getCredentials('prestashopApi');
 	const output = this.getNodeParameter('output', 'JSON') as string;
+	if (!_headers['Output-Format']) {
+		_headers['Output-Format'] = output;
+	}
 
 	let options: IHttpRequestOptions = {
 		method,
 		body,
 		baseURL: `${credentials.baseUrl}/api/`,
-		url: uri || `${resource}?${queryString}${queryString.length > 0 ? '&' : ''}output_format=${output}`,
+		url: uri || `${resource}?${queryString}`,
 		json: true,
+		headers: { ..._headers }
 	};
 
 	try {
@@ -628,7 +632,7 @@ export function getProductOptionalFields(): INodeProperties[] {
 					values: [
 						{
 							displayName: 'Language',
-							name: 'id',
+							name: 'idLang',
 							type: 'options',
 							typeOptions: {
 								loadOptionsMethod: 'getLanguages',
@@ -637,7 +641,7 @@ export function getProductOptionalFields(): INodeProperties[] {
 						},
 						{
 							displayName: 'Value',
-							name: 'value',
+							name: 'valueLang',
 							type: 'string',
 							default: '',
 						},
@@ -658,7 +662,7 @@ export function getProductOptionalFields(): INodeProperties[] {
 					values: [
 						{
 							displayName: 'Language',
-							name: 'id',
+							name: 'idLang',
 							type: 'options',
 							typeOptions: {
 								loadOptionsMethod: 'getLanguages',
@@ -667,7 +671,7 @@ export function getProductOptionalFields(): INodeProperties[] {
 						},
 						{
 							displayName: 'Value',
-							name: 'value',
+							name: 'valueLang',
 							type: 'string',
 							default: '',
 						},
@@ -688,7 +692,7 @@ export function getProductOptionalFields(): INodeProperties[] {
 					values: [
 						{
 							displayName: 'Language',
-							name: 'id',
+							name: 'idLang',
 							type: 'options',
 							typeOptions: {
 								loadOptionsMethod: 'getLanguages',
@@ -697,7 +701,7 @@ export function getProductOptionalFields(): INodeProperties[] {
 						},
 						{
 							displayName: 'Value',
-							name: 'value',
+							name: 'valueLang',
 							type: 'string',
 							default: '',
 						},
@@ -718,7 +722,7 @@ export function getProductOptionalFields(): INodeProperties[] {
 					values: [
 						{
 							displayName: 'Language',
-							name: 'id',
+							name: 'idLang',
 							type: 'options',
 							typeOptions: {
 								loadOptionsMethod: 'getLanguages',
@@ -727,8 +731,11 @@ export function getProductOptionalFields(): INodeProperties[] {
 						},
 						{
 							displayName: 'Value',
-							name: 'value',
+							name: 'valueLang',
 							type: 'string',
+							typeOptions: {
+								rows: 5,
+							},
 							default: '',
 						},
 					],
@@ -748,7 +755,7 @@ export function getProductOptionalFields(): INodeProperties[] {
 					values: [
 						{
 							displayName: 'Language',
-							name: 'id',
+							name: 'idLang',
 							type: 'options',
 							typeOptions: {
 								loadOptionsMethod: 'getLanguages',
@@ -757,8 +764,11 @@ export function getProductOptionalFields(): INodeProperties[] {
 						},
 						{
 							displayName: 'Value',
-							name: 'value',
+							name: 'valueLang',
 							type: 'string',
+							typeOptions: {
+								rows: 5,
+							},
 							default: '',
 						},
 					],
@@ -778,7 +788,7 @@ export function getProductOptionalFields(): INodeProperties[] {
 					values: [
 						{
 							displayName: 'Language',
-							name: 'id',
+							name: 'idLang',
 							type: 'options',
 							typeOptions: {
 								loadOptionsMethod: 'getLanguages',
@@ -787,7 +797,7 @@ export function getProductOptionalFields(): INodeProperties[] {
 						},
 						{
 							displayName: 'Value',
-							name: 'value',
+							name: 'valueLang',
 							type: 'string',
 							default: '',
 						},
@@ -808,7 +818,7 @@ export function getProductOptionalFields(): INodeProperties[] {
 					values: [
 						{
 							displayName: 'Language',
-							name: 'id',
+							name: 'idLang',
 							type: 'options',
 							typeOptions: {
 								loadOptionsMethod: 'getLanguages',
@@ -817,7 +827,7 @@ export function getProductOptionalFields(): INodeProperties[] {
 						},
 						{
 							displayName: 'Value',
-							name: 'value',
+							name: 'valueLang',
 							type: 'string',
 							default: '',
 						},
@@ -902,15 +912,6 @@ export async function getDefaultLanguage(this: ILoadOptionsFunctions): Promise<s
 	return '';
 }
 
-export async function formatMultilangField(field: Record<string, string>, tagName: string): Promise<string> {
-	return `<${tagName}>
-		${Object.entries(field)
-			.map(([langId, value]) => `<language id="${langId}">${value}</language>`)
-			.join('\n')}
-	</${tagName}>`;
-}
-
-
 export const sort = (a: { name: string }, b: { name: string }) => {
 	if (a.name < b.name) {
 		return -1;
@@ -920,3 +921,11 @@ export const sort = (a: { name: string }, b: { name: string }) => {
 	}
 	return 0;
 };
+
+export function buildMultilangField(field: { translations: Translation[] }) {
+	if (!field || !Array.isArray(field.translations)) return [];
+	return field.translations.map(({ idLang, valueLang }) => ({
+		'@_id': idLang,
+		'__cdata': valueLang,
+	}));
+}

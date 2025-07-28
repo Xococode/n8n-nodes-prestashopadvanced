@@ -8,3 +8,8 @@ export interface SortOrder {
 	field?: string;
 	direction?: string;
 }
+
+export interface Translation {
+	idLang: string;
+	valueLang: string;
+}

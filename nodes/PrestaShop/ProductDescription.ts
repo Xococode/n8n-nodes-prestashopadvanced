@@ -71,7 +71,6 @@ export const productFields: INodeProperties[] = [
 
 	/* -------------------------------------------------------------------------- */
 	/*                                   product:create			                  */
-	/*                                   product:update			                  */
 	/* -------------------------------------------------------------------------- */
 	{
 		displayName: 'Name',
@@ -89,7 +88,7 @@ export const productFields: INodeProperties[] = [
 				values: [
 					{
 						displayName: 'Language',
-						name: 'id',
+						name: 'idLang',
 						type: 'options',
 						typeOptions: {
 							loadOptionsMethod: 'getLanguages',
@@ -98,7 +97,7 @@ export const productFields: INodeProperties[] = [
 					},
 					{
 						displayName: 'Value',
-						name: 'value',
+						name: 'valueLang',
 						type: 'string',
 						default: '',
 					},
@@ -109,7 +108,7 @@ export const productFields: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['product'],
-				operation: ['create', 'update'],
+				operation: ['create',],
 			},
 		},
 	},
@@ -131,7 +130,7 @@ export const productFields: INodeProperties[] = [
 				values: [
 					{
 						displayName: 'Language',
-						name: 'id',
+						name: 'idLang',
 						type: 'options',
 						typeOptions: {
 							loadOptionsMethod: 'getLanguages',
@@ -140,7 +139,7 @@ export const productFields: INodeProperties[] = [
 					},
 					{
 						displayName: 'Value',
-						name: 'value',
+						name: 'valueLang',
 						type: 'string',
 						default: '',
 					},
@@ -151,7 +150,7 @@ export const productFields: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['product'],
-				operation: ['create', 'update'],
+				operation: ['create'],
 			},
 		},
 	},
@@ -163,11 +162,112 @@ export const productFields: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['product'],
-				operation: ['create', 'update'],
+				operation: ['create'],
 			},
 		},
 		default: 0,
 	},
+
+	/* -------------------------------------------------------------------------- */
+	/*                                   product:update			                  */
+	/* -------------------------------------------------------------------------- */
+	{
+		displayName: 'Name',
+		name: 'name',
+		type: 'fixedCollection',
+		placeholder: 'Add translations',
+		default: {},
+		typeOptions: {
+			multipleValues: true,
+		},
+		options: [
+			{
+				displayName: 'Translations',
+				name: 'translations',
+				values: [
+					{
+						displayName: 'Language',
+						name: 'idLang',
+						type: 'options',
+						typeOptions: {
+							loadOptionsMethod: 'getLanguages',
+						},
+						default: '',
+					},
+					{
+						displayName: 'Value',
+						name: 'valueLang',
+						type: 'string',
+						default: '',
+					},
+				],
+			},
+		],
+		displayOptions: {
+			show: {
+				resource: ['product'],
+				operation: ['update',],
+			},
+		},
+	},
+	{
+		displayName: 'Link Rewrite',
+		name: 'linkRewrite',
+		type: 'fixedCollection',
+		placeholder: 'Add translations',
+		default: {},
+		typeOptions: {
+			multipleValues: true,
+		},
+		options: [
+			{
+				displayName: 'Translations',
+				name: 'translations',
+				placeholder: 'Add translation',
+				default: {},
+				values: [
+					{
+						displayName: 'Language',
+						name: 'idLang',
+						type: 'options',
+						typeOptions: {
+							loadOptionsMethod: 'getLanguages',
+						},
+						default: '',
+					},
+					{
+						displayName: 'Value',
+						name: 'valueLang',
+						type: 'string',
+						default: '',
+					},
+				],
+			},
+		],
+		displayOptions: {
+			show: {
+				resource: ['product'],
+				operation: ['update'],
+			},
+		},
+	},
+	{
+		displayName: 'Price',
+		name: 'price',
+		type: 'number',
+		displayOptions: {
+			show: {
+				resource: ['product'],
+				operation: ['update'],
+			},
+		},
+		default: 0,
+	},
+	
+	/* -------------------------------------------------------------------------- */
+	/*                                   product:create			                  */
+	/*                                   product:update			                  */
+	/* -------------------------------------------------------------------------- */
 	{
 		displayName: 'Additional Fields',
 		name: 'additionalFields',
