@@ -1,0 +1,20 @@
+{
+	"node": "n8n-nodes-base.prestashopTrigger",
+	"nodeVersion": "1.0",
+	"codexVersion": "1.0",
+	"categories": [
+		"Sales"
+	],
+	"resources": {
+		"credentialDocumentation": [
+			{
+				"url": "https://devdocs.prestashop-project.org/9/webservice/tutorials/creating-access/"
+			}
+		],
+		"primaryDocumentation": [
+			{
+				"url": "https://devdocs.prestashop-project.org/9/webservice/"
+			}
+		]
+	}
+}
