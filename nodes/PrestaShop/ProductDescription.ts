@@ -1,6 +1,6 @@
 import type { INodeProperties } from 'n8n-workflow';
 
-import { getProductOptionalFields, getSearchFilters } from './GenericFunctions';
+import { getProductOptionalFields, getProductOptionalTranslatableFields, getSearchFilters } from './GenericFunctions';
 
 export const productOperations: INodeProperties[] = [
 	{
@@ -51,9 +51,9 @@ export const productOperations: INodeProperties[] = [
 
 export const productFields: INodeProperties[] = [
 	/* -------------------------------------------------------------------------- */
-	/*                                   product:delete			              */
+	/*                                   product:delete			                  */
 	/*                                   product:get			                  */
-	/*                                   product:update			              */
+	/*                                   product:update			                  */
 	/* -------------------------------------------------------------------------- */
 	{
 		displayName: 'Product ID',
@@ -261,13 +261,27 @@ export const productFields: INodeProperties[] = [
 				operation: ['update'],
 			},
 		},
-		default: 0,
+		default: '',
 	},
 	
 	/* -------------------------------------------------------------------------- */
 	/*                                   product:create			                  */
 	/*                                   product:update			                  */
 	/* -------------------------------------------------------------------------- */
+	{
+		displayName: 'Multi Language Fields',
+		name: 'translationFields',
+		type: 'collection',
+		placeholder: 'Add Field',
+		default: {},
+		displayOptions: {
+			show: {
+				resource: ['product'],
+				operation: ['create', 'update'],
+			},
+		},
+		options: [...getProductOptionalTranslatableFields()],
+	},
 	{
 		displayName: 'Additional Fields',
 		name: 'additionalFields',

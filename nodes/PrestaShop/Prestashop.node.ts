@@ -148,7 +148,6 @@ export class Prestashop implements INodeType {
 				return returnData;
 			},
 			async getShops(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-				// TODO agregar link de documentacion a todas estas 
 				//https://devdocs.prestashop-project.org/9/webservice/resources/shops/
 				const response = await prestashopApiRequest.call(
 					this,
@@ -497,6 +496,7 @@ export class Prestashop implements INodeType {
 						const linkRewriteTranslations = this.getNodeParameter('linkRewrite', i) as { translations: Translation[] };
 						const price = this.getNodeParameter('price', i) as number;
 						const additionalFields = this.getNodeParameter('additionalFields', i);
+						const translationFields = this.getNodeParameter('translationFields', i);
 
 						const response = await prestashopApiRequest.call(
 							this,
@@ -512,6 +512,17 @@ export class Prestashop implements INodeType {
 						productData.link_rewrite = { language: buildMultilangField(linkRewriteTranslations) };
 						productData.price = price;
 						productData.state = 1;
+						if (translationFields) {
+							for (const [key, value] of Object.entries(translationFields)) {
+								if (
+									value &&
+									typeof value === 'object' &&
+									Array.isArray((value as IDataObject).translations)
+								) {
+									productData[key] = { language: buildMultilangField(value as { translations: Translation[] }) };
+								}
+							}
+						}
 						Object.assign(productData, additionalFields);
 
 						[
@@ -593,13 +604,25 @@ export class Prestashop implements INodeType {
 						const nameTranslations = this.getNodeParameter('name', i) as { translations: Translation[] };
 						const linkRewriteTranslations = this.getNodeParameter('linkRewrite', i) as { translations: Translation[] };
 						const price = this.getNodeParameter('price', i) as number;
+						const translationFields = this.getNodeParameter('translationFields', i);
 						const additionalFields = this.getNodeParameter('additionalFields', i);
 
 						const productData:IDataObject = {};
 						productData.id = productId;
 						if (nameTranslations && Array.isArray(nameTranslations.translations)) productData.name = { language: buildMultilangField(nameTranslations) };
 						if (linkRewriteTranslations && Array.isArray(linkRewriteTranslations.translations)) productData.link_rewrite = { language: buildMultilangField(linkRewriteTranslations) };
-						if (price) productData.price = price;
+						if (price && price > 0) productData.price = price;
+						if (translationFields) {
+							for (const [key, value] of Object.entries(translationFields)) {
+								if (
+									value &&
+									typeof value === 'object' &&
+									Array.isArray((value as IDataObject).translations)
+								) {
+									productData[key] = { language: buildMultilangField(value as { translations: Translation[] }) };
+								}
+							}
+						}
 						Object.assign(productData, additionalFields);
 
 						for (const key of Object.keys(productData)) {

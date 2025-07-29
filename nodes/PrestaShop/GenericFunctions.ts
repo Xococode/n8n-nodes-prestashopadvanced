@@ -50,22 +50,6 @@ export async function prestashopApiRequest(
 		}
 
 		return await this.helpers.httpRequestWithAuthentication.call(this, 'prestashopApi', options);
-
-		// TODO validacion de errores
-		// Ejemplo:
-		// <?xml version="1.0" encoding="UTF-8"?>
-		// <prestashop xmlns:xlink="http://www.w3.org/1999/xlink">
-		// 	<errors>
-		// 		<error>
-		// 			<code>
-		// 				<![CDATA[85]]>
-		// 			</code>
-		// 			<message>
-		// 				<![CDATA[Validation error: "La propiedad Customer-&gt;active no es válida"]]>
-		// 			</message>
-		// 		</error>
-		// 	</errors>
-		// </prestashop>
 	} catch (error) {
 		throw new NodeApiError(this.getNode(), error as JsonObject);
 	}
@@ -619,12 +603,20 @@ export function getProductOptionalFields(): INodeProperties[] {
 		},
 		{ displayName: 'Delivery in Stock', name: 'delivery_in_stock', type: 'string', default: '' },
 		{ displayName: 'Delivery Out Stock', name: 'delivery_out_stock', type: 'string', default: '' },
+	];
+}
+
+export function getProductOptionalTranslatableFields(): INodeProperties[] {
+	return [
 		{
 			displayName: 'Meta Description',
 			name: 'meta_description',
 			type: 'fixedCollection',
 			placeholder: 'Add translations',
 			default: {},
+			typeOptions: {
+				multipleValues: true,
+			},
 			options: [
 				{
 					displayName: 'Translations',
@@ -655,6 +647,9 @@ export function getProductOptionalFields(): INodeProperties[] {
 			type: 'fixedCollection',
 			placeholder: 'Add translations',
 			default: {},
+			typeOptions: {
+				multipleValues: true,
+			},
 			options: [
 				{
 					displayName: 'Translations',
@@ -685,6 +680,9 @@ export function getProductOptionalFields(): INodeProperties[] {
 			type: 'fixedCollection',
 			placeholder: 'Add translations',
 			default: {},
+			typeOptions: {
+				multipleValues: true,
+			},
 			options: [
 				{
 					displayName: 'Translations',
@@ -715,6 +713,9 @@ export function getProductOptionalFields(): INodeProperties[] {
 			type: 'fixedCollection',
 			placeholder: 'Add translations',
 			default: {},
+			typeOptions: {
+				multipleValues: true,
+			},
 			options: [
 				{
 					displayName: 'Translations',
@@ -748,6 +749,9 @@ export function getProductOptionalFields(): INodeProperties[] {
 			type: 'fixedCollection',
 			placeholder: 'Add translations',
 			default: {},
+			typeOptions: {
+				multipleValues: true,
+			},
 			options: [
 				{
 					displayName: 'Translations',
@@ -781,6 +785,9 @@ export function getProductOptionalFields(): INodeProperties[] {
 			type: 'fixedCollection',
 			placeholder: 'Add translations',
 			default: {},
+			typeOptions: {
+				multipleValues: true,
+			},
 			options: [
 				{
 					displayName: 'Translations',
@@ -811,6 +818,9 @@ export function getProductOptionalFields(): INodeProperties[] {
 			type: 'fixedCollection',
 			placeholder: 'Add translations',
 			default: {},
+			typeOptions: {
+				multipleValues: true,
+			},
 			options: [
 				{
 					displayName: 'Translations',

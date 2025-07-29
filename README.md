@@ -41,9 +41,30 @@ Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes
 - Get all products
 
 ### Trigger Events
+- Address created
+- Carrier created
+- Cart Rule created
+- Cart created
+- Category created
+- Combination created
+- Customer Message created
+- Customer Thread created
 - Customer created
+- Employee created
+- Manufacturer created
+- Message created
+- Order Carrier created
+- Order Detail created
+- Order History created
+- Order Payment created
 - Order created
 - Product created
+- Specific Price Rule created
+- Specific Price created
+- Stock Available created
+- Store created
+- Supplier created
+- Tag created
 
 ## Credentials
 
