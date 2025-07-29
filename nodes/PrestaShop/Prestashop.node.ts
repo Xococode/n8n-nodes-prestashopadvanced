@@ -306,6 +306,8 @@ export class Prestashop implements INodeType {
 						for (const key of Object.keys(customerData)) {
 							if (typeof customerData[key] === 'boolean') {
 								customerData[key] = customerData[key] ? '1' : '0';
+							} else if (typeof customerData[key] === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/.test(customerData[key])) {
+								customerData[key] = customerData[key].replace('T', ' ');
 							}
 						}
 
@@ -386,6 +388,12 @@ export class Prestashop implements INodeType {
 						for (const key of Object.keys(customerData)) {
 							if (typeof customerData[key] === 'boolean') {
 								customerData[key] = customerData[key] ? '1' : '0';
+							} else if (typeof customerData[key] === 'string') {
+								if (key === 'birthday') {
+									customerData[key] = customerData[key].split('T')[0];
+								} else if(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/.test(customerData[key])) {
+									customerData[key] = customerData[key].replace('T', ' ');
+								}
 							}
 						}
 
@@ -538,6 +546,8 @@ export class Prestashop implements INodeType {
 						for (const key of Object.keys(productData)) {
 							if (typeof productData[key] === 'boolean') {
 								productData[key] = productData[key] ? '1' : '0';
+							} else if (typeof productData[key] === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/.test(productData[key])) {
+								productData[key] = productData[key].replace('T', ' ');
 							}
 						}
 
@@ -628,6 +638,8 @@ export class Prestashop implements INodeType {
 						for (const key of Object.keys(productData)) {
 							if (typeof productData[key] === 'boolean') {
 								productData[key] = productData[key] ? '1' : '0';
+							} else if (typeof productData[key] === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/.test(productData[key])) {
+								productData[key] = productData[key].replace('T', ' ');
 							}
 						}
 
