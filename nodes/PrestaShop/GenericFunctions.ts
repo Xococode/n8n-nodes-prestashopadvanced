@@ -86,7 +86,7 @@ function getConditionTypeFields(): INodeProperties {
 			{
 				name: 'Like',
 				value: 'like',
-				description: 'The value can contain the SQL wildcard character at the beginning|end|both',
+				description: 'The value can contain the SQL wildcard character (%) at the beginning|end|both',
 			},
 			{
 				name: 'Not Equal',
@@ -899,24 +899,61 @@ export function getOrderFields() {
 
 export function getSpecificPriceFields() {
 	return [
-		"id",
-		"id_shop_group",
-		"id_shop",
-		"id_cart",
-		"id_product",
-		"id_product_attribute",
-		"id_currency",
-		"id_country",
-		"id_group",
-		"id_customer",
-		"id_specific_price_rule",
-		"price",
-		"from_quantity",
-		"reduction",
-		"reduction_tax",
-		"reduction_type",
-		"from",
-		"to"
+		'id',
+		'id_shop_group',
+		'id_shop',
+		'id_cart',
+		'id_product',
+		'id_product_attribute',
+		'id_currency',
+		'id_country',
+		'id_group',
+		'id_customer',
+		'id_specific_price_rule',
+		'price',
+		'from_quantity',
+		'reduction',
+		'reduction_tax',
+		'reduction_type',
+		'from',
+		'to'
+	];
+}
+
+export function getCartRuleFields() {
+	return [
+		'id',
+		'id_customer',
+		'date_from',
+		'date_to',
+		'description',
+		'quantity',
+		'quantity_per_user',
+		'priority',
+		'partial_use',
+		'code',
+		'minimum_amount',
+		'minimum_amount_tax',
+		'minimum_amount_currency',
+		'minimum_amount_shipping',
+		'country_restriction',
+		'carrier_restriction',
+		'group_restriction',
+		'cart_rule_restriction',
+		'product_restriction',
+		'shop_restriction',
+		'free_shipping',
+		'reduction_percent',
+		'reduction_amount',
+		'reduction_tax',
+		'reduction_currency',
+		'reduction_product',
+		'reduction_exclude_special',
+		'gift_product',
+		'gift_product_attribute',
+		'highlight',
+		'active',
+		'name'
 	];
 }
 

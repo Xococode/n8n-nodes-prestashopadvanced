@@ -21,6 +21,7 @@ import {
 	getProductFields,
 	buildMultilangField,
 	getSpecificPriceFields,
+	getCartRuleFields,
 } from './GenericFunctions';
 import { customerFields, customerOperations } from './CustomerDescription';
 import { orderFields, orderOperations } from './OrderDescription';
@@ -31,6 +32,7 @@ import type {
 	Translation,
 } from './types';
 import { specificPriceFields, specificPriceOperations } from './SpecificPriceDescription';
+import { cartRuleFields, cartRuleOperations } from './CartRuleDescription';
 
 let cachedLanguages: INodePropertyOptions[] | null = null;
 
@@ -62,6 +64,10 @@ export class Prestashop implements INodeType {
 				type: 'options',
 				noDataExpression: true,
 				options: [
+					{
+						name: 'Cart Rule (Voucher)',
+						value: 'cart_rule',
+					},
 					{
 						name: 'Customer',
 						value: 'customer',
@@ -98,6 +104,8 @@ export class Prestashop implements INodeType {
 				],
 				default: 'JSON',
 			},
+			...cartRuleOperations,
+			...cartRuleFields,
 			...customerOperations,
 			...customerFields,
 			...orderOperations,
@@ -285,7 +293,7 @@ export class Prestashop implements INodeType {
 					'GET',
 					'currencies',
 					{},
-					'display=full',
+					'display=full&filter[active]=[1]',
 				);
 				const currencies = response['currencies'] || [];
 				const returnData: INodePropertyOptions[] = [];
@@ -372,6 +380,11 @@ export class Prestashop implements INodeType {
 					.map((field) => ({ name: capitalCase(field), value: field }))
 					.sort(sort);
 			},
+			async getCartRuleAttributes(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				return getCartRuleFields()
+					.map((field) => ({ name: capitalCase(field), value: field }))
+					.sort(sort);
+			},
 		},
 	};
 
@@ -385,6 +398,163 @@ export class Prestashop implements INodeType {
 
 		for (let i = 0; i < length; i++) {
 			try {
+				if (resource === 'cart_rule') {
+					if (operation === 'create') {
+						const nameTranslations = this.getNodeParameter('information.fields.name', i) as { translations: Translation[] };
+						const description = this.getNodeParameter('information.fields.description', i, '') as string;
+						const code = this.getNodeParameter('information.fields.code', i, '') as string;
+						const highlight = this.getNodeParameter('information.fields.highlight', i, false) as boolean;
+						const partialUse = this.getNodeParameter('information.fields.partial_use', i, false) as boolean;
+						const priority = this.getNodeParameter('information.fields.priority', i, 1) as number;
+						const active = this.getNodeParameter('information.fields.active', i, true) as boolean;
+
+						const idCustomer = this.getNodeParameter('conditions.fields.id_customer', i, 0) as number;
+						const dateFrom = this.getNodeParameter('conditions.fields.date_from', i, '') as string;
+						const dateTo = this.getNodeParameter('conditions.fields.date_to', i, '') as string;
+						const minimumAmount = this.getNodeParameter('conditions.fields.minimum_amount', i, 0) as number;
+						const minimumAmountCurrency = this.getNodeParameter('conditions.fields.minimum_amount_currency', i, 0) as number;
+						const minimumAmountTax = this.getNodeParameter('conditions.fields.minimum_amount_tax', i, false) as boolean;
+						const minimumAmountShipping = this.getNodeParameter('conditions.fields.minimum_amount_shipping', i, false) as boolean;
+						const quantity = this.getNodeParameter('conditions.fields.quantity', i, 1) as number;
+						const quantityPerUser = this.getNodeParameter('conditions.fields.quantity_per_user', i, 1) as number;
+
+						const freeShipping = this.getNodeParameter('actions.fields.free_shipping', i, false) as boolean;
+						const applyDiscount = this.getNodeParameter('actions.fields.apply_discount', i, 'off') as string;
+						const reductionPercent = this.getNodeParameter('actions.fields.reduction_percent', i, 0) as number;
+						const reductionAmount = this.getNodeParameter('actions.fields.reduction_amount', i, 0) as number;
+						const reductionCurrency = this.getNodeParameter('actions.fields.reduction_currency', i, 0) as number;
+						const reductionTax = this.getNodeParameter('actions.fields.reduction_tax', i, true) as boolean;
+						const applyDiscountTo = this.getNodeParameter('actions.fields.apply_discount_to', i, 'order') as string;
+						const reductionProduct = this.getNodeParameter('actions.fields.reduction_product', i, 0) as number;
+						const reductionExcludeSpecial = this.getNodeParameter('actions.fields.reduction_exclude_special', i, false) as boolean;
+						const freeGift = this.getNodeParameter('actions.fields.free_gift', i, false) as boolean;
+						const giftProduct = this.getNodeParameter('actions.fields.gift_product', i, 0) as number;
+						const giftProductAttribute = this.getNodeParameter('actions.fields.gift_product_attribute', i, 0) as number;
+
+						const response = await prestashopApiRequest.call(
+							this,
+							'GET',
+							`cart_rules`,
+							{},
+							'schema=blank',
+						);
+
+						const cartRuleData = Array.isArray(response.cart_rule)
+							? { ...response.cart_rule }
+							: (response.cart_rule || {});
+
+						cartRuleData.name = { language: buildMultilangField(nameTranslations) };
+						cartRuleData.description = description;
+						cartRuleData.code = code;
+						cartRuleData.highlight = highlight ? '1' : '0';
+						cartRuleData.partial_use = partialUse ? '1' : '0';
+						cartRuleData.priority = priority;
+						cartRuleData.active = active ? '1' : '0';
+
+						cartRuleData.id_customer = idCustomer;
+						cartRuleData.date_from = dateFrom;
+						cartRuleData.date_to = dateTo;
+						cartRuleData.minimum_amount = minimumAmount;
+						cartRuleData.minimum_amount_currency = minimumAmountCurrency;
+						cartRuleData.minimum_amount_tax = minimumAmountTax ? '1' : '0';
+						cartRuleData.minimum_amount_shipping = minimumAmountShipping ? '1' : '0';
+						cartRuleData.quantity = quantity;
+						cartRuleData.quantity_per_user = quantityPerUser;
+
+						cartRuleData.free_shipping = freeShipping ? '1' : '0';
+
+						if (applyDiscount === 'percent') {
+							cartRuleData.reduction_percent = reductionPercent;
+							cartRuleData.reduction_amount = 0;
+							cartRuleData.reduction_currency = 0;
+							cartRuleData.reduction_tax = '0';
+						} else if (applyDiscount === 'amount') {
+							cartRuleData.reduction_percent = 0;
+							cartRuleData.reduction_amount = reductionAmount;
+							cartRuleData.reduction_currency = reductionCurrency;
+							cartRuleData.reduction_tax = reductionTax ? '1' : '0';
+						} else {
+							cartRuleData.reduction_percent = 0;
+							cartRuleData.reduction_amount = 0;
+							cartRuleData.reduction_currency = 0;
+							cartRuleData.reduction_tax = '0';
+						}
+
+						cartRuleData.reduction_product = (applyDiscountTo === 'specific') ? reductionProduct : 0;
+						cartRuleData.reduction_exclude_special = reductionExcludeSpecial ? '1' : '0';
+
+						cartRuleData.gift_product = freeGift ? giftProduct : 0;
+						cartRuleData.gift_product_attribute = freeGift ? giftProductAttribute : 0;
+
+						['date_add', 'date_upd'].forEach((prop) => delete cartRuleData[prop]);
+
+						for (const key of Object.keys(cartRuleData)) {
+							if (typeof cartRuleData[key] === 'boolean') {
+								cartRuleData[key] = cartRuleData[key] ? '1' : '0';
+							} else if (typeof cartRuleData[key] === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/.test(cartRuleData[key])) {
+								cartRuleData[key] = cartRuleData[key].replace('T', ' ');
+							}
+						}
+
+						const builder = new XMLBuilder({ ignoreAttributes: false, cdataPropName: '__cdata' });
+						const body = `<?xml version="1.0" encoding="UTF-8"?>\n` +
+							builder.build({ prestashop: { cart_rule: cartRuleData } });
+
+						responseData = await prestashopApiRequest.call(
+							this,
+							'POST',
+							'cart_rules',
+							body
+						);
+					}
+
+					if (operation === 'delete') {
+						const cartRuleId = this.getNodeParameter('cartRuleId', i) as string;
+
+						responseData = await prestashopApiRequest.call(
+							this,
+							'DELETE',
+							`cart_rules/${cartRuleId}`,
+						);
+
+						responseData = { success: true };
+					}
+
+					if (operation === 'get') {
+						const cartRuleId = this.getNodeParameter('cartRuleId', i) as string;
+
+						responseData = await prestashopApiRequest.call(
+							this,
+							'GET',
+							`cart_rules/${cartRuleId}`,
+						);
+					}
+
+					if (operation === 'getAll') {
+						const limit = this.getNodeParameter('limit', 0) as number;
+						const filterType = this.getNodeParameter('filterType', i) as string;
+						const sortOption = this.getNodeParameter('options.sort', i, {}) as { sort: SortOrder[] };
+						let qs: string = '';
+
+						if (filterType === 'manual') {
+							const filters = this.getNodeParameter('filters', i) as { conditions: Filter[] };
+							qs = getFilterQuery({
+								...filters,
+								...sortOption,
+								limit: limit,
+							});
+						}
+
+						responseData = await prestashopApiRequest.call(
+							this,
+							'GET',
+							'cart_rules',
+							{},
+							qs,
+						);
+					}
+				}
+
 				if (resource === 'customer') {
 					if (operation === 'create') {
 						const email = this.getNodeParameter('email', i) as string;

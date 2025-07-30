@@ -19,6 +19,12 @@ Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes
 
 ## Operations
 
+#### Cart Rule (Voucher)
+- Create a cart rule
+- Delete a cart rule
+- Get a cart rule
+- Get all specific prices (allowing filtering and sorting by multiple fields)
+
 #### Customers
 - Create a customer
 - Update a customer (only the specified attributes)
@@ -43,10 +49,10 @@ Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes
 - Get all products (allowing filtering and sorting by multiple fields)
 
 #### Specific Prices
-- Create an specific price
-- Update an specific price (only the specified attributes)
-- Delete an specific price
-- Get an specific price
+- Create a specific price
+- Update a specific price (only the specified attributes)
+- Delete a specific price
+- Get a specific price
 - Get all specific prices (allowing filtering and sorting by multiple fields)
 
 ### Trigger Events
