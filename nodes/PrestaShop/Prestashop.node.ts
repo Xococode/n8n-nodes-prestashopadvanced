@@ -20,6 +20,7 @@ import {
 	sort,
 	getProductFields,
 	buildMultilangField,
+	getSpecificPriceFields,
 } from './GenericFunctions';
 import { customerFields, customerOperations } from './CustomerDescription';
 import { orderFields, orderOperations } from './OrderDescription';
@@ -29,6 +30,7 @@ import type {
 	SortOrder,
 	Translation,
 } from './types';
+import { specificPriceFields, specificPriceOperations } from './SpecificPriceDescription';
 
 let cachedLanguages: INodePropertyOptions[] | null = null;
 
@@ -72,10 +74,13 @@ export class Prestashop implements INodeType {
 						name: 'Product',
 						value: 'product',
 					},
+					{
+						name: 'Specific Price',
+						value: 'specific_price',
+					},
 				],
 				default: 'customer',
 			},
-			...customerOperations,
 			{
 				displayName: 'Output Format',
 				name: 'output',
@@ -93,11 +98,14 @@ export class Prestashop implements INodeType {
 				],
 				default: 'JSON',
 			},
+			...customerOperations,
 			...customerFields,
 			...orderOperations,
 			...orderFields,
 			...productOperations,
 			...productFields,
+			...specificPriceOperations,
+			...specificPriceFields
 		],
 	};
 
@@ -270,6 +278,80 @@ export class Prestashop implements INodeType {
 				returnData.sort(sort);
 				return returnData;
 			},
+			async getCurrencies(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				// https://devdocs.prestashop-project.org/9/webservice/resources/currencies/
+				const response = await prestashopApiRequest.call(
+					this,
+					'GET',
+					'currencies',
+					{},
+					'display=full',
+				);
+				const currencies = response['currencies'] || [];
+				const returnData: INodePropertyOptions[] = [];
+
+				for (const currency of currencies) {
+					returnData.push({
+						name: `${currency.name} (${currency.iso_code})`,
+						value: currency.id,
+					});
+				}
+
+				returnData.sort(sort);
+				returnData.unshift({ name: 'All currencies', value: 0 });
+
+				return returnData;
+			},
+			async getCountries(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				// https://devdocs.prestashop-project.org/9/webservice/resources/countries/
+				const language = await getDefaultLanguage.call(this);
+				const response = await prestashopApiRequest.call(
+					this,
+					'GET',
+					'countries',
+					{},
+					`language=${language}&display=full`,
+				);
+				const countries = response['countries'] || [];
+				const returnData: INodePropertyOptions[] = [];
+
+				for (const country of countries) {
+					returnData.push({
+						name: country.name,
+						value: country.id,
+					});
+				}
+
+				returnData.sort(sort);
+				returnData.unshift({ name: 'All countries', value: 0 });
+
+				return returnData;
+			},
+			async getCustomerGroups(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				// https://devdocs.prestashop-project.org/9/webservice/resources/groups/
+				const language = await getDefaultLanguage.call(this);
+				const response = await prestashopApiRequest.call(
+					this,
+					'GET',
+					'groups',
+					{},
+					`language=${language}&display=full`,
+				);
+				const groups = response['groups'] || [];
+				const returnData: INodePropertyOptions[] = [];
+
+				for (const group of groups) {
+					returnData.push({
+						name: group.name,
+						value: group.id,
+					});
+				}
+
+				returnData.sort(sort);
+				returnData.unshift({ name: 'All groups', value: 0 });
+
+				return returnData;
+			},
 			async getProductAttributes(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
 				return getProductFields()
 					.map((field) => ({ name: capitalCase(field), value: field }))
@@ -282,6 +364,11 @@ export class Prestashop implements INodeType {
 			},
 			async getCustomerAttributes(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
 				return getCustomerFields()
+					.map((field) => ({ name: capitalCase(field), value: field }))
+					.sort(sort);
+			},
+			async getSpecificPriceAttributes(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				return getSpecificPriceFields()
 					.map((field) => ({ name: capitalCase(field), value: field }))
 					.sort(sort);
 			},
@@ -554,7 +641,7 @@ export class Prestashop implements INodeType {
 							{},
 							'schema=blank',
 						);
-						
+
 						const productData = response.product || {};
 						
 						productData.name = { language: buildMultilangField(nameTranslations) };
@@ -753,6 +840,220 @@ export class Prestashop implements INodeType {
 							this,
 							'PATCH',
 							`stock_availables/${stockId}`,
+							body,
+						);
+					}
+				}
+
+				if (resource === 'specific_price') {
+					if (operation === 'create') {
+						const productId = this.getNodeParameter('productId', i) as number;
+						const combinationId = this.getNodeParameter('combinationId', i, 0) as number;
+						const currencyId = this.getNodeParameter('currencyId', i, 0) as number;
+						const countryId = this.getNodeParameter('countryId', i, 0) as number;
+						const groupId = this.getNodeParameter('groupId', i, 0) as number;
+						const customerId = this.getNodeParameter('customerId', i, 0) as number;
+						const fromQuantity = this.getNodeParameter('fromQuantity', i, 1) as number;
+						const isMultishop = this.getNodeParameter('isMultishop', i, false) as boolean;
+
+						const unlimitedDuration = this.getNodeParameter('unlimitedDuration', i, true) as boolean;
+						let fromDate = '0000-00-00 00:00:00';
+						let toDate = '0000-00-00 00:00:00';
+
+						if (!unlimitedDuration) {
+							fromDate = this.getNodeParameter('fromDate', i) as string;
+							toDate = this.getNodeParameter('toDate', i) as string;
+						}
+
+						const impactMode = this.getNodeParameter('impactMode', i) as string;
+						let reduction = 0;
+						let reductionTax = 1;
+						let reductionType = 'amount';
+						let fixedPrice = -1;
+
+						if (impactMode === 'discount') {
+							reduction = this.getNodeParameter('reductionValue', i) as number;
+							reductionTax = this.getNodeParameter('reductionIncludeTax', i, 1) as number;
+							reductionType = this.getNodeParameter('reductionType', i, 'amount') as string;
+							if (reductionType === 'percentage') {
+								reduction /= 100;
+							}
+							fixedPrice = -1;
+						} else if (impactMode === 'fixedPrice') {
+							reduction = 0;
+							reductionTax = 1;
+							reductionType = 'amount';
+							fixedPrice = this.getNodeParameter('fixedPriceTaxExcluded', i) as number;
+						}
+
+						const response = await prestashopApiRequest.call(
+							this,
+							'GET',
+							`specific_prices`,
+							{},
+							'schema=blank',
+						);
+
+						const specificPriceData = Array.isArray(response.specific_price)
+							? { ...response.specific_price }
+							: (response.specific_price || {});
+
+						specificPriceData.id_product = productId;
+						specificPriceData.id_product_attribute = combinationId;
+						specificPriceData.id_cart = 0;
+						specificPriceData.id_currency = currencyId;
+						specificPriceData.id_country = countryId;
+						specificPriceData.id_group = groupId;
+						specificPriceData.id_customer = customerId;
+						specificPriceData.from_quantity = fromQuantity;
+						specificPriceData.from = fromDate;
+						specificPriceData.to = toDate;
+						specificPriceData.price = fixedPrice;
+						specificPriceData.reduction = reduction;
+						specificPriceData.reduction_tax = reductionTax;
+						specificPriceData.reduction_type = reductionType;
+
+						if (isMultishop) {
+							const shopId = this.getNodeParameter('shopId', i, 0) as number;
+							const shopGroupId = this.getNodeParameter('shopGroupId', i, 0) as number;
+							specificPriceData.id_shop = shopId;
+							specificPriceData.id_shop_group = shopGroupId;
+						}
+
+						for (const key of Object.keys(specificPriceData)) {
+							if (typeof specificPriceData[key] === 'boolean') {
+								specificPriceData[key] = specificPriceData[key] ? '1' : '0';
+							} else if (typeof specificPriceData[key] === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/.test(specificPriceData[key])) {
+								specificPriceData[key] = specificPriceData[key].replace('T', ' ');
+							}
+						}
+
+						const builder = new XMLBuilder({ ignoreAttributes: false });
+						const body = `<?xml version="1.0" encoding="UTF-8"?>\n` +
+							builder.build({ prestashop: { specific_price: specificPriceData } });
+
+						responseData = await prestashopApiRequest.call(
+							this,
+							'POST',
+							'specific_prices',
+							body,
+						);
+					}
+
+					if (operation === 'delete') {
+						const specificPriceId = this.getNodeParameter('specificPriceId', i) as number;
+
+						responseData = await prestashopApiRequest.call(
+							this,
+							'DELETE',
+							`specific_prices/${specificPriceId}`,
+						);
+
+						responseData = { success: true };
+					}
+
+					if (operation === 'get') {
+						const specificPriceId = this.getNodeParameter('specificPriceId', i) as number;
+
+						responseData = await prestashopApiRequest.call(
+							this,
+							'GET',
+							`specific_prices/${specificPriceId}`,
+						);
+					}
+
+					if (operation === 'getAll') {
+						const limit = this.getNodeParameter('limit', 0) as number;
+						const filterType = this.getNodeParameter('filterType', i) as string;
+						const sortOption = this.getNodeParameter('options.sort', i, {}) as { sort: SortOrder[] };
+						let qs: string = '';
+
+						if (filterType === 'manual') {
+							const filters = this.getNodeParameter('filters', i) as { conditions: Filter[] };
+							qs = getFilterQuery({
+								...filters,
+								...sortOption,
+								limit: limit,
+							});
+						}
+
+						responseData = await prestashopApiRequest.call(
+							this,
+							'GET',
+							'specific_prices',
+							{},
+							qs,
+						);
+					}
+
+					if (operation === 'update') {
+						const specificPriceId = this.getNodeParameter('specificPriceId', i) as string;
+						const productId = this.getNodeParameter('productId', i) as string;
+						const combinationId = this.getNodeParameter('combinationId', i, 0) as number;
+						const currencyId = this.getNodeParameter('currencyId', i, 0) as number;
+						const countryId = this.getNodeParameter('countryId', i, 0) as number;
+						const groupId = this.getNodeParameter('groupId', i, 0) as number;
+						const customerId = this.getNodeParameter('customerId', i, 0) as number;
+						const fromQuantity = this.getNodeParameter('fromQuantity', i, 1) as number;
+						const unlimitedDuration = this.getNodeParameter('unlimitedDuration', i, true) as boolean;
+						const dateFrom = this.getNodeParameter('dateFrom', i, '') as string;
+						const dateTo = this.getNodeParameter('dateTo', i, '') as string;
+						const impactMode = this.getNodeParameter('impactMode', i) as string;
+						const isMultishop = this.getNodeParameter('isMultishop', i, false) as boolean;
+
+						const specificPriceData: IDataObject = {};
+						specificPriceData.id = specificPriceId;
+						if (productId) specificPriceData.id_product = productId;
+						if (combinationId) specificPriceData.id_product_attribute = combinationId;
+						if (fromQuantity) specificPriceData.from_quantity = fromQuantity;
+						if (currencyId) specificPriceData.id_currency = currencyId;
+						if (countryId) specificPriceData.id_country = countryId;
+						if (groupId) specificPriceData.id_group = groupId;
+						if (customerId) specificPriceData.id_customer = customerId;
+
+						if (impactMode === 'discount') {
+							const reduction = this.getNodeParameter('reductionValue', i, 0) as number;
+							const reductionTax = this.getNodeParameter('reductionIncludeTax', i, true) as boolean;
+							const reductionType = this.getNodeParameter('reductionType', i, 'amount') as string;
+							if (reduction !== undefined) specificPriceData.reduction = (reductionType === 'percentage' ? reduction / 100 : reduction);
+							if (reductionTax !== undefined) specificPriceData.reduction_tax = reductionTax ? '1' : '0';
+							if (reductionType) specificPriceData.reduction_type = reductionType;
+						} else if (impactMode === 'fixedPrice') {
+							const fixedPrice = this.getNodeParameter('fixedPriceTaxExcluded', i) as number;
+							if (fixedPrice !== undefined) specificPriceData.price = fixedPrice;
+						}
+
+						if (unlimitedDuration) {
+							specificPriceData.from = '0000-00-00 00:00:00';
+							specificPriceData.to = '0000-00-00 00:00:00';
+						} else {
+							if (dateFrom) specificPriceData.from = dateFrom.replace('T', ' ');
+							if (dateTo) specificPriceData.to = dateTo.replace('T', ' ');
+						}
+
+						if (isMultishop) {
+							const shopId = this.getNodeParameter('shopId', i, 0) as number;
+							const shopGroupId = this.getNodeParameter('shopGroupId', i, 0) as number;
+							if (shopId) specificPriceData.id_shop = shopId;
+							if (shopGroupId) specificPriceData.id_shop_group = shopGroupId;
+						}
+
+						for (const key of Object.keys(specificPriceData)) {
+							if (typeof specificPriceData[key] === 'boolean') {
+								specificPriceData[key] = specificPriceData[key] ? '1' : '0';
+							} else if (typeof specificPriceData[key] === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/.test(specificPriceData[key])) {
+								specificPriceData[key] = (specificPriceData[key] as string).replace('T', ' ');
+							}
+						}
+
+						const builder = new XMLBuilder({ ignoreAttributes: false });
+						const body = `<?xml version="1.0" encoding="UTF-8"?>\n` +
+							builder.build({ prestashop: { specific_price: specificPriceData } });
+
+						responseData = await prestashopApiRequest.call(
+							this,
+							'PATCH',
+							`specific_prices/${specificPriceId}`,
 							body,
 						);
 					}

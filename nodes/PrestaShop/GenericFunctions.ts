@@ -897,6 +897,29 @@ export function getOrderFields() {
 	];
 }
 
+export function getSpecificPriceFields() {
+	return [
+		"id",
+		"id_shop_group",
+		"id_shop",
+		"id_cart",
+		"id_product",
+		"id_product_attribute",
+		"id_currency",
+		"id_country",
+		"id_group",
+		"id_customer",
+		"id_specific_price_rule",
+		"price",
+		"from_quantity",
+		"reduction",
+		"reduction_tax",
+		"reduction_type",
+		"from",
+		"to"
+	];
+}
+
 let cachedDefaultLanguage: string = '';
 export async function getDefaultLanguage(this: ILoadOptionsFunctions): Promise<string> {
 	if (cachedDefaultLanguage) {

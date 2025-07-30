@@ -21,14 +21,14 @@ Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes
 
 #### Customers
 - Create a customer
-- Update a customer
+- Update a customer (only the specified attributes)
 - Delete a customer
 - Get a customer
-- Get all customers
+- Get all customers (allowing filtering and sorting by multiple fields)
 
 #### Orders
 - Get an order
-- Get all orders
+- Get all orders (allowing filtering and sorting by multiple fields)
 - Delete an order
 - Change order state
 - Set order internal note
@@ -36,10 +36,18 @@ Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes
 
 #### Products
 - Create a product
-- Update a product
+- Update a product (only the specified attributes)
+- Update a product stock (set quantity)
 - Delete a product
 - Get a product
-- Get all products
+- Get all products (allowing filtering and sorting by multiple fields)
+
+#### Specific Prices
+- Create an specific price
+- Update an specific price (only the specified attributes)
+- Delete an specific price
+- Get an specific price
+- Get all specific prices (allowing filtering and sorting by multiple fields)
 
 ### Trigger Events
 - Address created
