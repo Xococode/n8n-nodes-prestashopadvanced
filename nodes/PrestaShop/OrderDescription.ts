@@ -39,6 +39,12 @@ export const orderOperations: INodeProperties[] = [
 				action: 'Get many orders',
 			},
 			{
+				name: 'Set Internal Note',
+				value: 'orderNote',
+				description: 'Change an order internal note',
+				action: 'Change an order internal note',
+			},
+			{
 				name: 'Set Shipping Number',
 				value: 'shippingNumber',
 				description: 'Change an order shipping number',
@@ -55,6 +61,7 @@ export const orderFields: INodeProperties[] = [
 	/*                                   order:get			              		  */
 	/*                                   order:changeStatus			              */
 	/*                                   order:shippingNumber			          */
+	/*                                   order:orderNote			          */
 	/* -------------------------------------------------------------------------- */
 	{
 		displayName: 'Order ID',
@@ -65,7 +72,7 @@ export const orderFields: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['order'],
-				operation: ['delete', 'get', 'changeStatus', 'shippingNumber'],
+				operation: ['delete', 'get', 'changeStatus', 'shippingNumber', 'orderNote'], 
 			},
 		},
 	},
@@ -103,6 +110,26 @@ export const orderFields: INodeProperties[] = [
 			show: {
 				resource: ['order'],
 				operation: ['shippingNumber'],
+			},
+		},
+	},
+
+	/* -------------------------------------------------------------------------- */
+	/*                                   order:orderNote			          */
+	/* -------------------------------------------------------------------------- */
+	{
+		displayName: 'Internal Note',
+		name: 'orderNoteMessage',
+		type: 'string',
+		required: true,
+		default: '',
+		typeOptions: {
+			rows: 5,
+		},
+		displayOptions: {
+			show: {
+				resource: ['order'],
+				operation: ['orderNote'],
 			},
 		},
 	},

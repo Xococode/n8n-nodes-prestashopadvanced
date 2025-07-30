@@ -496,6 +496,26 @@ export class Prestashop implements INodeType {
 							body,
 						);
 					}
+
+					if (operation === 'orderNote') {
+						const orderId = this.getNodeParameter('orderId', i) as string;
+						const note = this.getNodeParameter('orderNoteMessage', i) as string;
+						
+						const orderData: IDataObject = {};
+						orderData.id = orderId;
+						orderData.note = note;
+
+						const builder = new XMLBuilder({ ignoreAttributes: false });
+						const body = `<?xml version="1.0" encoding="UTF-8"?>\n` +
+							builder.build({ prestashop: { order: orderData } });
+
+						responseData = await prestashopApiRequest.call(
+							this,
+							'PATCH',
+							`orders/${orderId}`,
+							body,
+						);
+					}
 				}
 
 				if (resource === 'product') {

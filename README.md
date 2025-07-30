@@ -31,6 +31,7 @@ Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes
 - Get all orders
 - Delete an order
 - Change order state
+- Set order internal note
 - Set order shipping number
 
 #### Products
