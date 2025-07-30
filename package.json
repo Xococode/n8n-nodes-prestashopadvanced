@@ -35,7 +35,7 @@
   "n8n": {
     "n8nNodesApiVersion": 1,
     "credentials": [
-      "dist/credentials/PrestaShopApi.credentials.js"
+      "dist/credentials/PrestashopApi.credentials.js"
     ],
     "nodes": [
       "dist/nodes/PrestaShop/Prestashop.node.js",

@@ -6,12 +6,17 @@ It supports both **actions** (managing main resources) and **triggers** (listeni
 
 [n8n](https://n8n.io/) is a [fair-code licensed](https://docs.n8n.io/reference/license/) workflow automation platform.
 
-[Installation](#installation)  
+[Installation](#installation)
+
 [Operations](#operations)  
+
 [Credentials](#credentials)
+
 [Compatibility](#compatibility)  
+
 [Usage](#usage)
-[Resources](#resources)  
+
+[Resources](#resources) 
 
 ## Installation
 
@@ -101,13 +106,16 @@ You need a **PrestaShop API Key** and the **base URL** of your store.
 
 1. Add the **PrestaShop** node to your workflow.
 2. Configure credentials.
-3. Choose a resource and an operation:
-   - `Customer`, `Order`, or `Product`
+3. Choose a resource and operation:
+   - `Customer`, `Order`, `Product`, `Cart Rules`, `Specific Prices`
    - For triggers, select one of the available events.
 4. Connect the node with other nodes in your automation.
 
+**For ready-to-use workflow examples, [CHECK THIS FOLDER](/examples/).**
+
 ## Resources
 
+* [PrestaShop + n8n workflow examples](/examples/)
 * [n8n community nodes documentation](https://docs.n8n.io/integrations/#community-nodes)
 * [PrestaShop webservice documentation](https://devdocs.prestashop-project.org/9/webservice/)
 

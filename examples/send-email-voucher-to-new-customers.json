@@ -1,0 +1,127 @@
+{
+  "name": "Send email with coupon to new customer",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "get",
+        "customerId": "={{ $json.id }}"
+      },
+      "type": "CUSTOM.prestashop",
+      "typeVersion": 1,
+      "position": [220, 0],
+      "id": "b5ba3c4f-31fc-4586-bc10-5273b08d86d7",
+      "name": "Get customer details"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [{ "mode": "everyHour" }]
+        },
+        "startingId": 7
+      },
+      "type": "CUSTOM.prestashopTrigger",
+      "typeVersion": 1,
+      "position": [0, 0],
+      "id": "f0e9e8e3-90f3-43b3-9ff2-75feb30c6547",
+      "name": "New customer created"
+    },
+    {
+      "parameters": {
+        "resource": "cart_rule",
+        "information": {
+          "fields": {
+            "name": {
+              "translations": [
+                { "idLang": 1, "valueLang": "Welcome" },
+                { "idLang": 2, "valueLang": "Welcome" }
+              ]
+            },
+            "code": "=HAPPY-BIRTHDAY-{{ $json.customer.id }}",
+            "highlight": true
+          }
+        },
+        "conditions": {
+          "fields": {
+            "date_from": "2025-07-30T17:31:40",
+            "date_to": "2025-08-06T17:31:44"
+          }
+        },
+        "actions": {
+          "fields": {
+            "apply_discount": "percent",
+            "reduction_percent": 5
+          }
+        }
+      },
+      "type": "CUSTOM.prestashop",
+      "typeVersion": 1,
+      "position": [440, 0],
+      "id": "124661c4-504d-4dff-b13c-a2bcb950e467",
+      "name": "Create discount coupon"
+    },
+    {
+      "parameters": {
+        "fromEmail": "wilson_alba@rolige.com",
+        "toEmail": "={{ $('Get customer details').item.json.customer.email }}",
+        "subject": "Start spending like a KING",
+        "html": "=HAPPY BIRTHDAY {{ $('Get customer details').item.json.customer.firstname }},\nThank you for joining us! We know your birthday is important, so we want to treat you with a 10% discount coupon in our store so you can spend big.\nUse this code on your next purchase and treat yourself: {{ $json.cart_rule.code }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [660, 0],
+      "id": "31a02649-5d8c-4181-b09d-5c72a63b3806",
+      "name": "Send coupon email"
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "value": "appKtyg1b275qW2eY",
+          "mode": "list"
+        },
+        "table": {
+          "value": "tbl0qvikQf9Nl93qX",
+          "mode": "list"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "firstname": "={{ $('Get customer details').item.json.customer.firstname }}",
+            "lastname": "={{ $('Get customer details').item.json.customer.lastname }}",
+            "email": "={{ $('Get customer details').item.json.customer.email }}",
+            "birthday": "={{ $('Get customer details').item.json.customer.birthday }}",
+            "voucher": "={{ $('Create discount coupon').item.json.cart_rule.code }}"
+          },
+          "matchingColumns": [],
+          "schema": []
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [880, 0],
+      "id": "5e23e513-8d0b-4793-a79f-59d9c8e36045",
+      "name": "Register coupon"
+    }
+  ],
+  "connections": {
+    "Get customer details": {
+      "main": [[{ "node": "Create discount coupon", "type": "main", "index": 0 }]]
+    },
+    "New customer created": {
+      "main": [[{ "node": "Get customer details", "type": "main", "index": 0 }]]
+    },
+    "Create discount coupon": {
+      "main": [[{ "node": "Send coupon email", "type": "main", "index": 0 }]]
+    },
+    "Send coupon email": {
+      "main": [[{ "node": "Register coupon", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "versionId": "cc5cfbd6-ef03-4939-9727-2c357f8c2b00",
+  "id": "r03erUjrFZnCuxUz",
+  "tags": []
+}

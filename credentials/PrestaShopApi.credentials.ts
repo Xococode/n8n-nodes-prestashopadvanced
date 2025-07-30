@@ -5,7 +5,7 @@ import type {
 	IHttpRequestOptions,
 	INodeProperties,
 } from 'n8n-workflow';
-export class PrestaShopApi implements ICredentialType {
+export class PrestashopApi implements ICredentialType {
 	name = 'prestashopApi';
 	displayName = 'PrestaShop API';
 	documentationUrl = 'https://devdocs.prestashop-project.org/9/webservice/getting-started/#enabling--creating-an-access-to-the-webservice';
