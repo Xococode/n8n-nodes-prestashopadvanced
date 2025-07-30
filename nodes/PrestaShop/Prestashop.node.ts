@@ -9,6 +9,7 @@ import {
 	INodeType,
 	INodeTypeDescription,
 	NodeConnectionType,
+	NodeOperationError,
 } from 'n8n-workflow';
 import {
 	getDefaultLanguage,
@@ -162,6 +163,26 @@ export class Prestashop implements INodeType {
 					returnData.push({
 						name: shop.name,
 						value: shop.id,
+					});
+				}
+				returnData.sort(sort);
+				return returnData;
+			},
+			async getShopGroups(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				//https://devdocs.prestashop-project.org/9/webservice/resources/shop_groups/
+				const response = await prestashopApiRequest.call(
+					this,
+					'GET',
+					'shop_groups',
+					{},
+					'display=full',
+				);
+				const shop_groups = response['shop_groups'] || [];
+				const returnData: INodePropertyOptions[] = [];
+				for (const shop_group of shop_groups) {
+					returnData.push({
+						name: shop_group.name,
+						value: shop_group.id,
 					});
 				}
 				returnData.sort(sort);
@@ -672,6 +693,67 @@ export class Prestashop implements INodeType {
 							'PATCH',
 							`products/${productId}`,
 							body
+						);
+					}
+
+					if (operation === 'stock') {
+						//https://devdocs.prestashop-project.org/9/webservice/resources/stock_availables/
+						const searchMode = this.getNodeParameter('searchMode', i) as string;
+						const quantity = this.getNodeParameter('quantity', i) as number;
+
+						let stockId: number | null = null;
+
+						if (searchMode === 'byStockId') {
+							stockId = this.getNodeParameter('stockId', i) as number;
+						} else if (searchMode === 'byCombination') {
+							const productId = this.getNodeParameter('productId', i) as string;
+							const combinationId = this.getNodeParameter('combinationId', i) as number;
+							const isMultishop = this.getNodeParameter('isMultishop', i, false) as boolean;
+
+							let query = `filter[id_product]=[${productId}]&filter[id_product_attribute]=[${combinationId}]`;
+
+							if (isMultishop) {
+								const shopId = this.getNodeParameter('shopId', i) as number;
+								const idShopGroup = this.getNodeParameter('shopGroupId', i) as number;
+								query += `&filter[id_shop]=[${shopId}]&filter[id_shop_group]=[${idShopGroup}]`;
+							}
+
+							const stockResponse = await prestashopApiRequest.call(
+								this,
+								'GET',
+								'stock_availables',
+								{},
+								query
+							);
+
+							if (stockResponse?.stock_availables?.length > 0) {
+								stockId = parseInt(stockResponse.stock_availables[0].id, 10);
+							} else {
+								throw new NodeOperationError(
+									this.getNode(),
+									`No stock records were found with these parameters.`
+								);
+							}
+						}
+
+						if (!stockId) {
+							throw new NodeOperationError(this.getNode(), 'No valid stock record identifier found.');
+						}
+
+						const stockData: IDataObject = {
+							id: stockId,
+							quantity,
+						};
+
+						const builder = new XMLBuilder({ ignoreAttributes: false });
+						const body = `<?xml version="1.0" encoding="UTF-8"?>\n` +
+							builder.build({ prestashop: { stock_available: stockData } });
+
+						responseData = await prestashopApiRequest.call(
+							this,
+							'PATCH',
+							`stock_availables/${stockId}`,
+							body,
 						);
 					}
 				}

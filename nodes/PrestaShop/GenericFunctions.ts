@@ -921,6 +921,24 @@ export async function getDefaultLanguage(this: ILoadOptionsFunctions): Promise<s
 	return '';
 }
 
+export async function checkMultishop(this: ILoadOptionsFunctions): Promise<{ name: string; value: boolean }[]> {
+	//https://devdocs.prestashop-project.org/9/webservice/resources/configurations/
+	const response = await prestashopApiRequest.call(
+		this,
+		'GET',
+		'/configurations',
+		{},
+		'filter[name]=[PS_MULTISHOP_FEATURE_ACTIVE]&display=full',
+	);
+	
+	const languageConfigurations = response['configurations'] || [];
+	for (const conf of languageConfigurations) {
+		return [{ name: 'Is Multishop', value: conf.value ? true : false }];
+	}
+
+	return [{ name: 'Is Multishop', value: false }];
+}
+
 export const sort = (a: { name: string }, b: { name: string }) => {
 	if (a.name < b.name) {
 		return -1;

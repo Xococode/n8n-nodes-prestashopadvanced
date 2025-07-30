@@ -39,6 +39,12 @@ export const productOperations: INodeProperties[] = [
 				action: 'Get many products',
 			},
 			{
+				name: 'Stock',
+				value: 'stock',
+				description: 'Update a product stock',
+				action: 'Update a product stock',
+			},
+			{
 				name: 'Update',
 				value: 'update',
 				description: 'Update a product',
@@ -295,6 +301,138 @@ export const productFields: INodeProperties[] = [
 			},
 		},
 		options: [...getProductOptionalFields()],
+	},
+
+	/* -------------------------------------------------------------------------- */
+	/*                                   product:stock			                  */
+	/* -------------------------------------------------------------------------- */
+	{
+		displayName: 'Search Mode',
+		name: 'searchMode',
+		type: 'options',
+		options: [
+			{
+				name: 'By Stock ID Available',
+				value: 'byStockId',
+			},
+			{
+				name: 'By Product + Combination + Shop',
+				value: 'byCombination',
+			},
+		],
+		displayOptions: {
+			show: {
+				resource: ['product'],
+				operation: ['stock'],
+			},
+		},
+		default: 'byStockId',
+		description: 'Select how you want to find the stock record to update',
+	},
+
+	{
+		displayName: 'Stock ID',
+		name: 'stockId',
+		type: 'number',
+		default: 0,
+		required: true,
+		displayOptions: {
+			show: {
+				resource: ['product'],
+				operation: ['stock'],
+				searchMode: ['byStockId'],
+			},
+		},
+	},
+
+	{
+		displayName: 'Product ID',
+		name: 'productId',
+		type: 'number',
+		default: 0,
+		required: true,
+		displayOptions: {
+			show: {
+				resource: ['product'],
+				operation: ['stock'],
+				searchMode: ['byCombination'],
+			},
+		},
+	},
+	{
+		displayName: 'Combination ID',
+		name: 'combinationId',
+		type: 'number',
+		default: 0,
+		required: true,
+		displayOptions: {
+			show: {
+				resource: ['product'],
+				operation: ['stock'],
+				searchMode: ['byCombination'],
+			},
+		},
+	},
+
+	{
+		displayName: 'Is Multishop',
+		name: 'isMultishop',
+		type: 'hidden',
+		typeOptions: {
+			loadOptionsMethod: 'checkMultishop',
+		},
+		default: false,
+	},
+	{
+		displayName: 'Shop Name or ID',
+		name: 'shopId',
+		type: 'options',
+		description: 'Choose from the list. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
+		typeOptions: {
+			loadOptionsMethod: 'getShops',
+		},
+		default: 1,
+		required: true,
+		displayOptions: {
+			show: {
+				resource: ['product'],
+				operation: ['stock'],
+				searchMode: ['byCombination'],
+				isMultishop: [true],
+			},
+		},
+	},
+	{
+		displayName: 'Shop Group Name or ID',
+		name: 'shopGroupId',
+		type: 'options',
+		description: 'Choose from the list. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
+		typeOptions: {
+			loadOptionsMethod: 'getShopGroups',
+		},
+		default: 0,
+		required: true,
+		displayOptions: {
+			show: {
+				resource: ['product'],
+				operation: ['stock'],
+				searchMode: ['byCombination'],
+				isMultishop: [true],
+			},
+		},
+	},
+	{
+		displayName: 'Quantity',
+		name: 'quantity',
+		type: 'number',
+		default: 0,
+		required: true,
+		displayOptions: {
+			show: {
+				resource: ['product'],
+				operation: ['stock'],
+			},
+		},
 	},
 
 	/* -------------------------------------------------------------------------- */
