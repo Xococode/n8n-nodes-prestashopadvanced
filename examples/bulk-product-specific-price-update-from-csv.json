@@ -56,7 +56,7 @@
         },
         "options": {}
       },
-      "type": "CUSTOM.prestashop",
+      "type": "n8n-nodes-prestashopadvanced.prestashop",
       "typeVersion": 1,
       "position": [
         -100,
@@ -106,7 +106,7 @@
         "reductionValue": "={{ $('Convert CSV to JSON').item.json.percentage / 100 }}",
         "reductionType": "percentage"
       },
-      "type": "CUSTOM.prestashop",
+      "type": "n8n-nodes-prestashopadvanced.prestashop",
       "typeVersion": 1,
       "position": [
         340,
@@ -127,7 +127,7 @@
         "price": -1,
         "from_quantity": 1
       },
-      "type": "CUSTOM.prestashop",
+      "type": "n8n-nodes-prestashopadvanced.prestashop",
       "typeVersion": 1,
       "position": [
         340,

@@ -33,7 +33,7 @@
         },
         "options": {}
       },
-      "type": "CUSTOM.prestashop",
+      "type": "n8n-nodes-prestashopadvanced.prestashop",
       "typeVersion": 1,
       "position": [
         -540,
@@ -49,7 +49,7 @@
         "orderId": "={{ $json.orders[0].id }}",
         "orderStateId": "={{ $('Receive ERP Webhook').item.json.body.orderStateId }}"
       },
-      "type": "CUSTOM.prestashop",
+      "type": "n8n-nodes-prestashopadvanced.prestashop",
       "typeVersion": 1,
       "position": [
         -320,

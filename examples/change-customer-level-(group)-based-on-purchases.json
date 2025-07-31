@@ -13,7 +13,7 @@
         "event": "order_histories.created",
         "startingId": 19
       },
-      "type": "CUSTOM.prestashopTrigger",
+      "type": "n8n-nodes-prestashopadvanced.prestashopTrigger",
       "typeVersion": 1,
       "position": [
         -1780,
@@ -52,7 +52,7 @@
         "resource": "order",
         "orderId": "={{ $json.order_history.id_order }}"
       },
-      "type": "CUSTOM.prestashop",
+      "type": "n8n-nodes-prestashopadvanced.prestashop",
       "typeVersion": 1,
       "position": [
         -1340,
@@ -79,7 +79,7 @@
         "operation": "get",
         "customerId": "={{ $('Get Order Details').item.json.order.id_customer }}"
       },
-      "type": "CUSTOM.prestashop",
+      "type": "n8n-nodes-prestashopadvanced.prestashop",
       "typeVersion": 1,
       "position": [
         -680,
@@ -131,7 +131,7 @@
           "id_default_group": "={{$json.newGroup}}"
         }
       },
-      "type": "CUSTOM.prestashop",
+      "type": "n8n-nodes-prestashopadvanced.prestashop",
       "typeVersion": 1,
       "position": [
         -20,

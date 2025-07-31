@@ -12,7 +12,7 @@
         },
         "startingId": 1
       },
-      "type": "CUSTOM.prestashopTrigger",
+      "type": "n8n-nodes-prestashopadvanced.prestashopTrigger",
       "typeVersion": 1,
       "position": [0, 0],
       "name": "New order created"
