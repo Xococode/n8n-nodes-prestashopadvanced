@@ -1,4 +1,4 @@
-# n8n-nodes-prestashop
+# n8n-nodes-prestashopadvanced
 
 This is an n8n community node. It lets you integrate [PrestaShop](https://www.prestashop.com/) Webservice/API in your n8n workflows.
 
@@ -16,6 +16,8 @@ It supports both **actions** (managing main resources) and **triggers** (listeni
 ## Installation
 
 Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes/installation/) in the n8n community nodes documentation.
+
+npm Package Name: **n8n-nodes-prestashopadvanced**
 
 ## Operations
 
