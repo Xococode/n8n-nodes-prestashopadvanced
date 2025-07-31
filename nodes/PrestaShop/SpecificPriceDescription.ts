@@ -114,11 +114,12 @@ export const specificPriceFields: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Shop Group',
+		displayName: 'Shop Group Name or ID',
 		name: 'shopGroupId',
 		type: 'options',
+		description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
 		typeOptions: { loadOptionsMethod: 'getShopGroups' },
-		default: 0,
+		default: '',
 		displayOptions: {
 			show: {
 				resource: ['specific_price'],
@@ -128,11 +129,12 @@ export const specificPriceFields: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Shop',
+		displayName: 'Shop Name or ID',
 		name: 'shopId',
 		type: 'options',
+		description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
 		typeOptions: { loadOptionsMethod: 'getShops' },
-		default: 0,
+		default: '',
 		displayOptions: {
 			show: {
 				resource: ['specific_price'],
@@ -142,11 +144,12 @@ export const specificPriceFields: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Currency',
+		displayName: 'Currency Name or ID',
 		name: 'currencyId',
 		type: 'options',
+		description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
 		typeOptions: { loadOptionsMethod: 'getCurrencies' },
-		default: 0,
+		default: '',
 		displayOptions: {
 			show: {
 				resource: ['specific_price'],
@@ -155,11 +158,12 @@ export const specificPriceFields: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Country',
+		displayName: 'Country Name or ID',
 		name: 'countryId',
 		type: 'options',
+		description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
 		typeOptions: { loadOptionsMethod: 'getCountries' },
-		default: 0,
+		default: '',
 		displayOptions: {
 			show: {
 				resource: ['specific_price'],
@@ -168,11 +172,12 @@ export const specificPriceFields: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Customer Group',
+		displayName: 'Customer Group Name or ID',
 		name: 'groupId',
 		type: 'options',
+		description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
 		typeOptions: { loadOptionsMethod: 'getCustomerGroups' },
-		default: 0,
+		default: '',
 		displayOptions: {
 			show: {
 				resource: ['specific_price'],
@@ -250,8 +255,8 @@ export const specificPriceFields: INodeProperties[] = [
 		name: 'impactMode',
 		type: 'options',
 		options: [
-			{ name: 'Apply discount to base price', value: 'discount' },
-			{ name: 'Set specific price', value: 'fixed' },
+			{ name: 'Apply Discount to Base Price', value: 'discount' },
+			{ name: 'Set Specific Price', value: 'fixed' },
 		],
 		default: 'discount',
 		displayOptions: {
@@ -305,7 +310,7 @@ export const specificPriceFields: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Fixed Price (tax excluded)',
+		displayName: 'Fixed Price (Tax Excluded)',
 		name: 'fixedPriceTaxExcluded',
 		type: 'number',
 		default: 0,
@@ -325,14 +330,17 @@ export const specificPriceFields: INodeProperties[] = [
 		displayName: 'Limit',
 		name: 'limit',
 		type: 'number',
+		typeOptions: {
+			minValue: 1,
+		},
 		displayOptions: {
 			show: {
 				resource: ['specific_price'],
 				operation: ['getAll'],
 			},
 		},
-		default: 0,
-		description: 'Max number of results to return. Set to 0 for no limit.',
+		default: 50,
+		description: 'Max number of results to return',
 	},
 	...getSearchFilters('specific_price', 'getSpecificPriceAttributes', 'getSpecificPriceAttributes'),
 ];

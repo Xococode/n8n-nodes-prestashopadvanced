@@ -61,7 +61,7 @@ export const orderFields: INodeProperties[] = [
 	/*                                   order:get			              		  */
 	/*                                   order:changeStatus			              */
 	/*                                   order:shippingNumber			          */
-	/*                                   order:orderNote			          */
+	/*                                   order:orderNote			              */
 	/* -------------------------------------------------------------------------- */
 	{
 		displayName: 'Order ID',
@@ -81,9 +81,10 @@ export const orderFields: INodeProperties[] = [
 	/*                                   order:changeStatus			              */
 	/* -------------------------------------------------------------------------- */
 	{
-		displayName: 'Order State ID',
+		displayName: 'Order State Name or ID',
 		name: 'orderStateId',
 		type: 'options',
+		description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
 		typeOptions: {
 			loadOptionsMethod: 'getOrderStates'
 		},
@@ -115,7 +116,7 @@ export const orderFields: INodeProperties[] = [
 	},
 
 	/* -------------------------------------------------------------------------- */
-	/*                                   order:orderNote			          */
+	/*                                   order:orderNote			              */
 	/* -------------------------------------------------------------------------- */
 	{
 		displayName: 'Internal Note',
@@ -141,14 +142,17 @@ export const orderFields: INodeProperties[] = [
 		displayName: 'Limit',
 		name: 'limit',
 		type: 'number',
+		typeOptions: {
+			minValue: 1,
+		},
 		displayOptions: {
 			show: {
 				resource: ['order'],
 				operation: ['getAll'],
 			},
 		},
-		default: 0,
-		description: 'Max number of results to return. Set to 0 for no limit.',
+		default: 50,
+		description: 'Max number of results to return',
 	},
 	...getSearchFilters('order', 'getOrderAttributes', 'getOrderAttributes'),
 ];

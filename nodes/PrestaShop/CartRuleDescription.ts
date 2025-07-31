@@ -77,6 +77,30 @@ export const cartRuleFields: INodeProperties[] = [
 				name: 'fields',
 				values: [
 					{
+						displayName: 'Active',
+						name: 'active',
+						type: 'boolean',
+						default: true,
+					},
+					{
+						displayName: 'Code',
+						name: 'code',
+						type: 'string',
+						default: '',
+					},
+					{
+						displayName: 'Description',
+						name: 'description',
+						type: 'string',
+						default: '',
+					},
+					{
+						displayName: 'Highlight',
+						name: 'highlight',
+						type: 'boolean',
+						default: false,
+					},
+					{
 						displayName: 'Name',
 						name: 'name',
 						type: 'fixedCollection',
@@ -90,13 +114,14 @@ export const cartRuleFields: INodeProperties[] = [
 								name: 'translations',
 								values: [
 									{
-										displayName: 'Language',
+										displayName: 'Language Name or ID',
 										name: 'idLang',
 										type: 'options',
 										typeOptions: {
 											loadOptionsMethod: 'getLanguages',
 										},
 										default: '',
+										description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
 									},
 									{
 										displayName: 'Value',
@@ -109,25 +134,6 @@ export const cartRuleFields: INodeProperties[] = [
 						],
 					},
 					{
-						displayName: 'Description',
-						name: 'description',
-						type: 'string',
-						default: '',
-					},
-					{
-						displayName: 'Code',
-						name: 'code',
-						type: 'string',
-						default: '',
-						description: 'If left empty, it will be automatically applied.',
-					},
-					{
-						displayName: 'Highlight',
-						name: 'highlight',
-						type: 'boolean',
-						default: false,
-					},
-					{
 						displayName: 'Partial Use',
 						name: 'partial_use',
 						type: 'boolean',
@@ -138,12 +144,6 @@ export const cartRuleFields: INodeProperties[] = [
 						name: 'priority',
 						type: 'number',
 						default: 1,
-					},
-					{
-						displayName: 'Active',
-						name: 'active',
-						type: 'boolean',
-						default: true,
 					},
 				],
 			},
@@ -173,43 +173,30 @@ export const cartRuleFields: INodeProperties[] = [
 						default: 0,
 					},
 					{
-						displayName: 'Valid From',
-						name: 'date_from',
-						type: 'dateTime',
-						required: true,
-						default: '',
-					},
-					{
-						displayName: 'Valid To',
-						name: 'date_to',
-						type: 'dateTime',
-						required: true,
-						default: '',
-					},
-					{
 						displayName: 'Minimum Amount',
 						name: 'minimum_amount',
 						type: 'number',
 						default: 0,
 					},
 					{
-						displayName: 'Minimum Amount Currency',
+						displayName: 'Minimum Amount Currency Name or ID',
 						name: 'minimum_amount_currency',
 						type: 'options',
 						typeOptions: {
 							loadOptionsMethod: 'getCurrencies',
 						},
-						default: 0,
-					},
-					{
-						displayName: 'Minimum Amount Includes Tax',
-						name: 'minimum_amount_tax',
-						type: 'boolean',
-						default: false,
+						default: '',
+						description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
 					},
 					{
 						displayName: 'Minimum Amount Includes Shipping',
 						name: 'minimum_amount_shipping',
+						type: 'boolean',
+						default: false,
+					},
+					{
+						displayName: 'Minimum Amount Includes Tax',
+						name: 'minimum_amount_tax',
 						type: 'boolean',
 						default: false,
 					},
@@ -224,6 +211,20 @@ export const cartRuleFields: INodeProperties[] = [
 						name: 'quantity_per_user',
 						type: 'number',
 						default: 1,
+					},
+					{
+						displayName: 'Valid From',
+						name: 'date_from',
+						type: 'dateTime',
+						required: true,
+						default: '',
+					},
+					{
+						displayName: 'Valid To',
+						name: 'date_to',
+						type: 'dateTime',
+						required: true,
+						default: '',
 					},
 				],
 			},
@@ -247,12 +248,6 @@ export const cartRuleFields: INodeProperties[] = [
 				name: 'fields',
 				values: [
 					{
-						displayName: 'Free Shipping',
-						name: 'free_shipping',
-						type: 'boolean',
-						default: false,
-					},
-					{
 						displayName: 'Apply Discount',
 						name: 'apply_discount',
 						type: 'options',
@@ -262,53 +257,6 @@ export const cartRuleFields: INodeProperties[] = [
 							{ name: 'None', value: 'off' },
 						],
 						default: 'off',
-					},
-					{
-						displayName: 'Discount Percentage',
-						name: 'reduction_percent',
-						type: 'number',
-						default: 0,
-						displayOptions: {
-							show: {
-								apply_discount: ['percent'],
-							},
-						},
-					},
-					{
-						displayName: 'Discount Amount',
-						name: 'reduction_amount',
-						type: 'number',
-						default: 0,
-						displayOptions: {
-							show: {
-								apply_discount: ['amount'],
-							},
-						},
-					},
-					{
-						displayName: 'Discount Currency',
-						name: 'reduction_currency',
-						type: 'options',
-						typeOptions: {
-							loadOptionsMethod: 'getCurrencies',
-						},
-						default: 0,
-						displayOptions: {
-							show: {
-								apply_discount: ['amount'],
-							},
-						},
-					},
-					{
-						displayName: 'Discount Includes Tax',
-						name: 'reduction_tax',
-						type: 'boolean',
-						default: true,
-						displayOptions: {
-							show: {
-								apply_discount: ['amount'],
-							},
-						},
 					},
 					{
 						displayName: 'Apply Discount To',
@@ -327,13 +275,50 @@ export const cartRuleFields: INodeProperties[] = [
 						},
 					},
 					{
-						displayName: 'Specific Discount Product',
-						name: 'reduction_product',
+						displayName: 'Discount Amount',
+						name: 'reduction_amount',
 						type: 'number',
 						default: 0,
 						displayOptions: {
 							show: {
-								apply_discount_to: ['specific'],
+								apply_discount: ['amount'],
+							},
+						},
+					},
+					{
+						displayName: 'Discount Currency Name or ID',
+						name: 'reduction_currency',
+						type: 'options',
+						typeOptions: {
+							loadOptionsMethod: 'getCurrencies',
+						},
+						default: '',
+						displayOptions: {
+							show: {
+								apply_discount: ['amount'],
+							},
+						},
+						description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
+					},
+					{
+						displayName: 'Discount Includes Tax',
+						name: 'reduction_tax',
+						type: 'boolean',
+						default: true,
+						displayOptions: {
+							show: {
+								apply_discount: ['amount'],
+							},
+						},
+					},
+					{
+						displayName: 'Discount Percentage',
+						name: 'reduction_percent',
+						type: 'number',
+						default: 0,
+						displayOptions: {
+							show: {
+								apply_discount: ['percent'],
 							},
 						},
 					},
@@ -344,8 +329,8 @@ export const cartRuleFields: INodeProperties[] = [
 						default: false,
 					},
 					{
-						displayName: 'Send Gift',
-						name: 'free_gift',
+						displayName: 'Free Shipping',
+						name: 'free_shipping',
 						type: 'boolean',
 						default: false,
 					},
@@ -371,6 +356,23 @@ export const cartRuleFields: INodeProperties[] = [
 							},
 						},
 					},
+					{
+						displayName: 'Send Gift',
+						name: 'free_gift',
+						type: 'boolean',
+						default: false,
+					},
+					{
+						displayName: 'Specific Discount Product',
+						name: 'reduction_product',
+						type: 'number',
+						default: 0,
+						displayOptions: {
+							show: {
+								apply_discount_to: ['specific'],
+							},
+						},
+					},
 				],
 			},
 		],
@@ -383,7 +385,7 @@ export const cartRuleFields: INodeProperties[] = [
 	},
 
 	/* -------------------------------------------------------------------------- */
-	/*                                   cart_rule:getAll			          */
+	/*                                   cart_rule:getAll			              */
 	/* -------------------------------------------------------------------------- */
 	{
 		displayName: 'Limit',
@@ -395,8 +397,11 @@ export const cartRuleFields: INodeProperties[] = [
 				operation: ['getAll'],
 			},
 		},
-		default: 0,
-		description: 'Max number of results to return. Set to 0 for no limit.',
+		typeOptions: {
+			minValue: 1,
+		},
+		default: 50,
+		description: 'Max number of results to return',
 	},
 	...getSearchFilters('cart_rule', 'getCartRuleAttributes', 'getCartRuleAttributes'),
 ];

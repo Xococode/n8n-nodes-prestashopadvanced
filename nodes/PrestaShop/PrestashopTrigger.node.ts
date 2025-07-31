@@ -46,12 +46,12 @@ export class PrestashopTrigger implements INodeType {
 					value: 'carriers.created',
 				},
 				{
-					name: 'Cart Rule Created',
-					value: 'cart_rules.created',
-				},
-				{
 					name: 'Cart Created',
 					value: 'carts.created',
+				},
+				{
+					name: 'Cart Rule Created',
+					value: 'cart_rules.created',
 				},
 				{
 					name: 'Category Created',
@@ -62,16 +62,16 @@ export class PrestashopTrigger implements INodeType {
 					value: 'combinations.created',
 				},
 				{
+					name: 'Customer Created',
+					value: 'customers.created',
+				},
+				{
 					name: 'Customer Message Created',
 					value: 'customer_messages.created',
 				},
 				{
 					name: 'Customer Thread Created',
 					value: 'customer_threads.created',
-				},
-				{
-					name: 'Customer Created',
-					value: 'customers.created',
 				},
 				{
 					name: 'Employee Created',
@@ -90,6 +90,10 @@ export class PrestashopTrigger implements INodeType {
 					value: 'order_carriers.created',
 				},
 				{
+					name: 'Order Created',
+					value: 'orders.created',
+				},
+				{
 					name: 'Order Detail Created',
 					value: 'order_details.created',
 				},
@@ -102,20 +106,16 @@ export class PrestashopTrigger implements INodeType {
 					value: 'order_payments.created',
 				},
 				{
-					name: 'Order Created',
-					value: 'orders.created',
-				},
-				{
 					name: 'Product Created',
 					value: 'products.created',
 				},
 				{
-					name: 'Specific Price Rule Created',
-					value: 'specific_price_rules.created',
-				},
-				{
 					name: 'Specific Price Created',
 					value: 'specific_prices.created',
+				},
+				{
+					name: 'Specific Price Rule Created',
+					value: 'specific_price_rules.created',
 				},
 				{
 					name: 'Stock Available Created',

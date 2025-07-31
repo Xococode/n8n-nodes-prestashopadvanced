@@ -213,8 +213,11 @@ export const customerFields: INodeProperties[] = [
 				operation: ['getAll'],
 			},
 		},
-		default: 0,
-		description: 'Max number of results to return. Set to 0 for no limit.',
+		typeOptions: {
+			minValue: 1,
+		},
+		default: 50,
+		description: 'Max number of results to return',
 	},
 	...getSearchFilters('customer', 'getCustomerAttributes', 'getCustomerAttributes'),
 ];

@@ -93,9 +93,10 @@ export const productFields: INodeProperties[] = [
 				name: 'translations',
 				values: [
 					{
-						displayName: 'Language',
+						displayName: 'Language Name or ID',
 						name: 'idLang',
 						type: 'options',
+						description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
 						typeOptions: {
 							loadOptionsMethod: 'getLanguages',
 						},
@@ -135,9 +136,10 @@ export const productFields: INodeProperties[] = [
 				default: {},
 				values: [
 					{
-						displayName: 'Language',
+						displayName: 'Language Name or ID',
 						name: 'idLang',
 						type: 'options',
+						description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
 						typeOptions: {
 							loadOptionsMethod: 'getLanguages',
 						},
@@ -192,9 +194,10 @@ export const productFields: INodeProperties[] = [
 				name: 'translations',
 				values: [
 					{
-						displayName: 'Language',
+						displayName: 'Language Name or ID',
 						name: 'idLang',
 						type: 'options',
+						description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
 						typeOptions: {
 							loadOptionsMethod: 'getLanguages',
 						},
@@ -233,9 +236,10 @@ export const productFields: INodeProperties[] = [
 				default: {},
 				values: [
 					{
-						displayName: 'Language',
+						displayName: 'Language Name or ID',
 						name: 'idLang',
 						type: 'options',
+						description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
 						typeOptions: {
 							loadOptionsMethod: 'getLanguages',
 						},
@@ -391,7 +395,7 @@ export const productFields: INodeProperties[] = [
 		typeOptions: {
 			loadOptionsMethod: 'getShops',
 		},
-		default: 1,
+		default: '',
 		required: true,
 		displayOptions: {
 			show: {
@@ -410,7 +414,7 @@ export const productFields: INodeProperties[] = [
 		typeOptions: {
 			loadOptionsMethod: 'getShopGroups',
 		},
-		default: 0,
+		default: '',
 		required: true,
 		displayOptions: {
 			show: {
@@ -436,20 +440,23 @@ export const productFields: INodeProperties[] = [
 	},
 
 	/* -------------------------------------------------------------------------- */
-	/*                                   product:getAll			              */
+	/*                                   product:getAll			                  */
 	/* -------------------------------------------------------------------------- */
 	{
 		displayName: 'Limit',
 		name: 'limit',
 		type: 'number',
+		typeOptions: {
+			minValue: 1,
+		},
 		displayOptions: {
 			show: {
 				resource: ['product'],
 				operation: ['getAll'],
 			},
 		},
-		default: 0,
-		description: 'Max number of results to return. Set to 0 for no limit.',
+		default: 50,
+		description: 'Max number of results to return',
 	},
 	...getSearchFilters('product', 'getProductAttributes', 'getProductAttributes'),
 ];

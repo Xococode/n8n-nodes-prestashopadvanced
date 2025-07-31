@@ -324,14 +324,14 @@ export function getCustomerOptionalFields(): INodeProperties[] {
 			default: '',
 		},
 		{
-			displayName: 'Language ID',
+			displayName: 'Language Name or ID',
 			name: 'id_lang',
 			type: 'options',
 			description: 'Choose from the list. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
 			typeOptions: {
 				loadOptionsMethod: 'getLanguages',
 			},
-			default: 0,
+			default: '',
 		},
 		{
 			displayName: 'Newsletter Date Added',
@@ -478,6 +478,7 @@ export function getProductOptionalFields(): INodeProperties[] {
 			displayName: 'Manufacturer Name or ID',
 			name: 'id_manufacturer',
 			type: 'options',
+			description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
 			typeOptions: { loadOptionsMethod: 'getManufacturers' },
 			default: '',
 		},
@@ -485,6 +486,7 @@ export function getProductOptionalFields(): INodeProperties[] {
 			displayName: 'Supplier Name or ID',
 			name: 'id_supplier',
 			type: 'options',
+			description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
 			typeOptions: { loadOptionsMethod: 'getSuppliers' },
 			default: '',
 		},
@@ -492,6 +494,7 @@ export function getProductOptionalFields(): INodeProperties[] {
 			displayName: 'Default Category Name or ID',
 			name: 'id_category_default',
 			type: 'options',
+			description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
 			typeOptions: { loadOptionsMethod: 'getCategories' },
 			default: '',
 		},
@@ -622,9 +625,10 @@ export function getProductOptionalTranslatableFields(): INodeProperties[] {
 					name: 'translations',
 					values: [
 						{
-							displayName: 'Language',
+							displayName: 'Language Name or ID',
 							name: 'idLang',
 							type: 'options',
+							description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
 							typeOptions: {
 								loadOptionsMethod: 'getLanguages',
 							},
@@ -655,9 +659,10 @@ export function getProductOptionalTranslatableFields(): INodeProperties[] {
 					name: 'translations',
 					values: [
 						{
-							displayName: 'Language',
+							displayName: 'Language Name or ID',
 							name: 'idLang',
 							type: 'options',
+							description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
 							typeOptions: {
 								loadOptionsMethod: 'getLanguages',
 							},
@@ -688,9 +693,10 @@ export function getProductOptionalTranslatableFields(): INodeProperties[] {
 					name: 'translations',
 					values: [
 						{
-							displayName: 'Language',
+							displayName: 'Language Name or ID',
 							name: 'idLang',
 							type: 'options',
+							description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
 							typeOptions: {
 								loadOptionsMethod: 'getLanguages',
 							},
@@ -721,9 +727,10 @@ export function getProductOptionalTranslatableFields(): INodeProperties[] {
 					name: 'translations',
 					values: [
 						{
-							displayName: 'Language',
+							displayName: 'Language Name or ID',
 							name: 'idLang',
 							type: 'options',
+							description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
 							typeOptions: {
 								loadOptionsMethod: 'getLanguages',
 							},
@@ -757,9 +764,10 @@ export function getProductOptionalTranslatableFields(): INodeProperties[] {
 					name: 'translations',
 					values: [
 						{
-							displayName: 'Language',
+							displayName: 'Language Name or ID',
 							name: 'idLang',
 							type: 'options',
+							description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
 							typeOptions: {
 								loadOptionsMethod: 'getLanguages',
 							},
@@ -793,9 +801,10 @@ export function getProductOptionalTranslatableFields(): INodeProperties[] {
 					name: 'translations',
 					values: [
 						{
-							displayName: 'Language',
+							displayName: 'Language Name or ID',
 							name: 'idLang',
 							type: 'options',
+							description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
 							typeOptions: {
 								loadOptionsMethod: 'getLanguages',
 							},
@@ -826,9 +835,10 @@ export function getProductOptionalTranslatableFields(): INodeProperties[] {
 					name: 'translations',
 					values: [
 						{
-							displayName: 'Language',
+							displayName: 'Language Name or ID',
 							name: 'idLang',
 							type: 'options',
+							description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
 							typeOptions: {
 								loadOptionsMethod: 'getLanguages',
 							},
