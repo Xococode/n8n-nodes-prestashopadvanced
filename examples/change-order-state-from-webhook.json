@@ -1,0 +1,141 @@
+{
+  "name": "Update Order State from ERP",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "update-order-state",
+        "options": {
+          "responseMode": "lastNode",
+          "responseContentType": "application/json"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        -760,
+        -120
+      ],
+      "name": "Receive ERP Webhook"
+    },
+    {
+      "parameters": {
+        "resource": "order",
+        "operation": "getAll",
+        "filterType": "manual",
+        "filters": {
+          "conditions": [
+            {
+              "field": "reference",
+              "value": "={{ $json.body.orderReference }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "CUSTOM.prestashop",
+      "typeVersion": 1,
+      "position": [
+        -540,
+        -120
+      ],
+      "id": "e327a46a-ad36-4eb9-b67c-130033d5d689",
+      "name": "Search order by reference"
+    },
+    {
+      "parameters": {
+        "resource": "order",
+        "operation": "changeStatus",
+        "orderId": "={{ $json.orders[0].id }}",
+        "orderStateId": "={{ $('Receive ERP Webhook').item.json.body.orderStateId }}"
+      },
+      "type": "CUSTOM.prestashop",
+      "typeVersion": 1,
+      "position": [
+        -320,
+        -120
+      ],
+      "name": "Change order state"
+    },
+    {
+      "parameters": {
+        "options": {},
+        "responseBody": "={ \"success\": true }"
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        -100,
+        -120
+      ],
+      "name": "Success Response"
+    }
+  ],
+  "pinData": {
+    "Receive ERP Webhook": [
+      {
+        "json": {
+          "headers": {
+            "content-type": "application/json",
+            "user-agent": "PostmanRuntime/7.44.1",
+            "accept": "*/*",
+            "cache-control": "no-cache",
+            "postman-token": "8965721c-a021-413d-9aaa-58c71d75e383",
+            "host": "localhost:5678",
+            "accept-encoding": "gzip, deflate, br",
+            "connection": "keep-alive",
+            "content-length": "48"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "orderReference": "XXXXXX",
+            "orderStateId": 2
+          },
+          "webhookUrl": "http://localhost:5678/webhook-test/update-order-state",
+          "executionMode": "test"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Receive ERP Webhook": {
+      "main": [
+        [
+          {
+            "node": "Search order by reference",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Change order state": {
+      "main": [
+        [
+          {
+            "node": "Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search order by reference": {
+      "main": [
+        [
+          {
+            "node": "Change order state",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1d0d39c2-8cf5-4c94-a632-cc2a74acbca8"
+}

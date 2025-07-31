@@ -1,0 +1,181 @@
+{
+  "name": "Sync Products with Google Sheets + Convert to PDF + Export to FTP",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 5
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        -440,
+        -20
+      ],
+      "name": "Schedule daily",
+      "id": "4bd64466-aeed-4183-b938-bf31e39afead"
+    },
+    {
+      "parameters": {
+        "resource": "product",
+        "operation": "getAll",
+        "filterType": "manual",
+        "filters": {
+          "conditions": [
+            {
+              "field": "active",
+              "value": "1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "CUSTOM.prestashop",
+      "typeVersion": 1,
+      "position": [
+        -220,
+        -20
+      ],
+      "name": "Get all active products",
+      "id": "44488ad2-462b-48ac-8215-eab139f7be6c"
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        220,
+        -20
+      ],
+      "name": "Upsert Google Sheets",
+      "id": "64644484-7fd7-458b-9ed2-9a5f7bae472d"
+    },
+    {
+      "parameters": {
+        "operation": "export",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        440,
+        -20
+      ],
+      "name": "Export PDF",
+      "id": "b8ea8270-c325-40b9-a660-fbaf7d651b1b"
+    },
+    {
+      "parameters": {
+        "path": "/product_catalog.pdf"
+      },
+      "type": "n8n-nodes-base.ftp",
+      "typeVersion": 1,
+      "position": [
+        660,
+        -20
+      ],
+      "name": "Upload to FTP",
+      "id": "cb54dabc-1386-4da4-9855-8088d194b799"
+    },
+    {
+      "parameters": {
+        "resource": "product",
+        "operation": "get",
+        "productId": "={{ $json.id }}"
+      },
+      "type": "CUSTOM.prestashop",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -20
+      ],
+      "id": "41c091f0-6da7-40d0-af84-e6bebf4efc2d",
+      "name": "Get product details"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule daily": {
+      "main": [
+        [
+          {
+            "node": "Get all active products",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get all active products": {
+      "main": [
+        [
+          {
+            "node": "Get product details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upsert Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Export PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Export PDF": {
+      "main": [
+        [
+          {
+            "node": "Upload to FTP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get product details": {
+      "main": [
+        [
+          {
+            "node": "Upsert Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "ca3248ed-c279-43e1-8fd8-62a516ae1782",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a795f7726a824521e86496106d8b0ba53f3697f1774472d63e782a41351897f0"
+  },
+  "id": "PPiwSH9J9KNubvlY",
+  "tags": []
+}

@@ -1,0 +1,244 @@
+{
+  "name": "Mass Update Specific Prices from CSV",
+  "nodes": [
+    {
+      "parameters": {
+        "filePath": "/data/products-discounts.csv"
+      },
+      "type": "n8n-nodes-base.readBinaryFile",
+      "typeVersion": 1,
+      "position": [
+        -760,
+        0
+      ],
+      "name": "Read CSV File"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.spreadsheetFile",
+      "typeVersion": 1,
+      "position": [
+        -540,
+        0
+      ],
+      "name": "Convert CSV to JSON"
+    },
+    {
+      "parameters": {
+        "batchSize": 1
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 1,
+      "position": [
+        -320,
+        0
+      ],
+      "name": "Split Rows"
+    },
+    {
+      "parameters": {
+        "resource": "specific_price",
+        "operation": "getAll",
+        "filterType": "manual",
+        "filters": {
+          "conditions": [
+            {
+              "field": "id_product",
+              "value": "={{$json.product_id}}"
+            },
+            {
+              "field": "reduction_type",
+              "value": "percentage"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "CUSTOM.prestashop",
+      "typeVersion": 1,
+      "position": [
+        -100,
+        0
+      ],
+      "name": "Find Specific Price"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "dfecca8a-6cce-4ae8-bcc7-04439064431a",
+              "leftValue": "={{$json.specific_prices && $json.specific_prices.length > 0}}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        120,
+        0
+      ],
+      "name": "Has Specific Price?"
+    },
+    {
+      "parameters": {
+        "resource": "specific_price",
+        "operation": "update",
+        "specificPriceId": "={{$json.specific_prices[0].id}}",
+        "unlimitedDuration": false,
+        "reductionValue": "={{ $('Convert CSV to JSON').item.json.percentage / 100 }}",
+        "reductionType": "percentage"
+      },
+      "type": "CUSTOM.prestashop",
+      "typeVersion": 1,
+      "position": [
+        340,
+        -120
+      ],
+      "name": "Update Specific Price"
+    },
+    {
+      "parameters": {
+        "resource": "specific_price",
+        "operation": "create",
+        "specificPriceId": "={{$json.specific_prices[0].id}}",
+        "unlimitedDuration": true,
+        "id_product": "={{ $('Convert CSV to JSON').item.json.product_id }}",
+        "reductionValue": "={{ $('Convert CSV to JSON').item.json.percentage / 100 }}",
+        "reductionType": "percentage",
+        "reductionTax": true,
+        "price": -1,
+        "from_quantity": 1
+      },
+      "type": "CUSTOM.prestashop",
+      "typeVersion": 1,
+      "position": [
+        340,
+        120
+      ],
+      "name": "Create Specific Price"
+    },
+    {
+      "parameters": {
+        "toEmail": "admin@mishop.com",
+        "subject": "Mass Specific Price Update Completed",
+        "text": "The mass update of specific prices has been completed. Please review n8n execution data for details."
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [
+        560,
+        0
+      ],
+      "name": "Send Summary Email"
+    }
+  ],
+  "connections": {
+    "Read CSV File": {
+      "main": [
+        [
+          {
+            "node": "Convert CSV to JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert CSV to JSON": {
+      "main": [
+        [
+          {
+            "node": "Split Rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Rows": {
+      "main": [
+        [
+          {
+            "node": "Find Specific Price",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Specific Price": {
+      "main": [
+        [
+          {
+            "node": "Has Specific Price?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Specific Price?": {
+      "main": [
+        [
+          {
+            "node": "Update Specific Price",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create Specific Price",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Specific Price": {
+      "main": [
+        [
+          {
+            "node": "Send Summary Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Specific Price": {
+      "main": [
+        [
+          {
+            "node": "Send Summary Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "b20e8231-2c65-4f20-bdb4-b1c1b567fc0c"
+}

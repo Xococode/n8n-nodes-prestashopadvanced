@@ -1,0 +1,315 @@
+{
+  "name": "Customer Group Update Based on Total Purchases",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyHour"
+            }
+          ]
+        },
+        "event": "order_histories.created",
+        "startingId": 19
+      },
+      "type": "CUSTOM.prestashopTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1780,
+        0
+      ],
+      "name": "New Order State Change",
+      "id": "f1f444af-6454-40eb-9cb7-578281e33b04"
+    },
+    {
+      "parameters": {
+        "url": "=https://myshop.com/api/order_histories/{{ $json.id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "output_format",
+              "value": "JSON"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        -1560,
+        0
+      ],
+      "name": "Get Order History Details",
+      "id": "d64afcc6-6a4c-4c7c-9b1a-44f453aee008"
+    },
+    {
+      "parameters": {
+        "resource": "order",
+        "orderId": "={{ $json.order_history.id_order }}"
+      },
+      "type": "CUSTOM.prestashop",
+      "typeVersion": 1,
+      "position": [
+        -1340,
+        0
+      ],
+      "name": "Get Order Details",
+      "id": "d0b23a3e-604a-419a-944a-bcc77dc59511"
+    },
+    {
+      "parameters": {
+        "functionCode": "const orders = items[0].json.orders;\nlet total = 0;\nfor (const order of orders) {\n  const amount = parseFloat(order.total_paid) * parseFloat(order.conversion_rate);\n  total += amount;\n}\nreturn [{ json: { totalPurchases: total } }];"
+      },
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        -900,
+        0
+      ],
+      "name": "Calculate Total",
+      "id": "4c6d5ea4-d846-48b1-ae02-a224785c5179"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "customerId": "={{ $('Get Order Details').item.json.order.id_customer }}"
+      },
+      "type": "CUSTOM.prestashop",
+      "typeVersion": 1,
+      "position": [
+        -680,
+        0
+      ],
+      "name": "Get Customer",
+      "id": "9440398f-4e45-4dc5-9371-d0cffc90d290"
+    },
+    {
+      "parameters": {
+        "functionCode": "const total = $json.totalPurchases;\nlet newGroup = 1;\nif (total >= 100 && total < 500) {\n  newGroup = 2;\n} else if (total >= 500) {\n  newGroup = 3;\n}\nconst currentGroup = $json.customer.id_default_group;\nconst changeType = (newGroup > currentGroup) ? 'upgrade' : (newGroup < currentGroup ? 'downgrade' : 'same');\nreturn [{ json: { newGroup, currentGroup, changeType } }];"
+      },
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        -460,
+        0
+      ],
+      "name": "Determine Group Change",
+      "id": "5aabd021-a847-4994-be3f-e7ee166300ae"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [],
+          "number": [
+            {
+              "value1": "={{$json.newGroup}}",
+              "operation": "notEqual",
+              "value2": "={{$json.currentGroup}}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        -240,
+        0
+      ],
+      "name": "Group Changed?",
+      "id": "e6b9268a-7941-404c-b1ca-0ab011e98753"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "customerId": "={{ $('Get Customer').item.json.customer.id }}",
+        "additionalFields": {
+          "id_default_group": "={{$json.newGroup}}"
+        }
+      },
+      "type": "CUSTOM.prestashop",
+      "typeVersion": 1,
+      "position": [
+        -20,
+        0
+      ],
+      "name": "Update Customer Group",
+      "id": "07213a25-184e-4f3a-b6be-fcf32a1589ef"
+    },
+    {
+      "parameters": {
+        "fromEmail": "admin@myshop.com",
+        "toEmail": "={{ $json.customer.email }}",
+        "subject": "Your customer group has been updated",
+        "html": "={{ $('Group Changed?').item.json.changeTypes === 'upgrade' ? 'Congratulation! Your account has been upgraded to a higher customer group with more benefits.' : ($('Group Changed?').item.json.changeTypes === 'downgrade' ? 'Your account has been moved to a lower customer group. Please contact support for more information.' : '') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        200,
+        0
+      ],
+      "name": "Send Email Notification",
+      "id": "983bd9a0-b890-4360-9ee6-4291b285cd07",
+      "webhookId": "6f571397-f921-4aca-9b4e-f3b2ab29b9ad"
+    },
+    {
+      "parameters": {
+        "url": "=https://myshop.com/api/orders",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "output_format",
+              "value": "JSON"
+            },
+            {
+              "name": "display",
+              "value": "[id,total_paid,conversion_rate]"
+            },
+            {
+              "name": "filter[valid]",
+              "value": "[1]"
+            },
+            {
+              "name": "filter[id_customer]",
+              "value": "=[{{ $json.order.id_customer }}]"
+            },
+            {
+              "name": "filter[invoice_date]",
+              "value": "=>[{{ new Date(new Date().setMonth(new Date().getMonth() - 6)).toISOString().split('T')[0] }}]"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        -1120,
+        0
+      ],
+      "name": "Get Last 6 Months Orders",
+      "id": "808637d1-b666-42af-b94f-2af04c9a764c"
+    }
+  ],
+  "connections": {
+    "New Order State Change": {
+      "main": [
+        [
+          {
+            "node": "Get Order History Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Order History Details": {
+      "main": [
+        [
+          {
+            "node": "Get Order Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Order Details": {
+      "main": [
+        [
+          {
+            "node": "Get Last 6 Months Orders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate Total": {
+      "main": [
+        [
+          {
+            "node": "Get Customer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Customer": {
+      "main": [
+        [
+          {
+            "node": "Determine Group Change",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Determine Group Change": {
+      "main": [
+        [
+          {
+            "node": "Group Changed?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Group Changed?": {
+      "main": [
+        [
+          {
+            "node": "Update Customer Group",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Customer Group": {
+      "main": [
+        [
+          {
+            "node": "Send Email Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Last 6 Months Orders": {
+      "main": [
+        [
+          {
+            "node": "Calculate Total",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "e809d6d9-6f7a-4c00-98a8-d41df8c56340",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a795f7726a824521e86496106d8b0ba53f3697f1774472d63e782a41351897f0"
+  },
+  "id": "f90aaBU3ryo11StL",
+  "tags": []
+}

@@ -1,5 +1,5 @@
 {
-  "name": "Send email with coupon to new customer",
+  "name": "Send Email with Coupon to New Customer",
   "nodes": [
     {
       "parameters": {
@@ -8,22 +8,12 @@
       },
       "type": "CUSTOM.prestashop",
       "typeVersion": 1,
-      "position": [220, 0],
-      "id": "b5ba3c4f-31fc-4586-bc10-5273b08d86d7",
+      "position": [
+        220,
+        0
+      ],
+      "id": "3e40f95b-cf6d-4eb1-8716-9e43fde61fc3",
       "name": "Get customer details"
-    },
-    {
-      "parameters": {
-        "pollTimes": {
-          "item": [{ "mode": "everyHour" }]
-        },
-        "startingId": 7
-      },
-      "type": "CUSTOM.prestashopTrigger",
-      "typeVersion": 1,
-      "position": [0, 0],
-      "id": "f0e9e8e3-90f3-43b3-9ff2-75feb30c6547",
-      "name": "New customer created"
     },
     {
       "parameters": {
@@ -32,8 +22,14 @@
           "fields": {
             "name": {
               "translations": [
-                { "idLang": 1, "valueLang": "Welcome" },
-                { "idLang": 2, "valueLang": "Welcome" }
+                {
+                  "idLang": 1,
+                  "valueLang": "Welcome"
+                },
+                {
+                  "idLang": 2,
+                  "valueLang": "Bienvenido"
+                }
               ]
             },
             "code": "=HAPPY-BIRTHDAY-{{ $json.customer.id }}",
@@ -55,34 +51,67 @@
       },
       "type": "CUSTOM.prestashop",
       "typeVersion": 1,
-      "position": [440, 0],
-      "id": "124661c4-504d-4dff-b13c-a2bcb950e467",
-      "name": "Create discount coupon"
+      "position": [
+        440,
+        0
+      ],
+      "id": "3c61fda4-ba7c-4b00-9338-56d8ac7c8a3e",
+      "name": "Create discount"
     },
     {
       "parameters": {
         "fromEmail": "wilson_alba@rolige.com",
         "toEmail": "={{ $('Get customer details').item.json.customer.email }}",
-        "subject": "Start spending like a KING",
-        "html": "=HAPPY BIRTHDAY {{ $('Get customer details').item.json.customer.firstname }},\nThank you for joining us! We know your birthday is important, so we want to treat you with a 10% discount coupon in our store so you can spend big.\nUse this code on your next purchase and treat yourself: {{ $json.cart_rule.code }}",
+        "subject": "So you can spend like a KING",
+        "html": "=HAPPY BIRTHDAY {{ $('Get customer details').item.json.customer.firstname }}!!,<br><br>Thank you for joining us! We know your birthday is important, so we want to treat you with a 10% discount coupon in our store so you can spend big.<br><br>Use this code on your next purchase and treat yourself: <b>{{ $json.cart_rule.code }}</b>",
         "options": {}
       },
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2.1,
-      "position": [660, 0],
-      "id": "31a02649-5d8c-4181-b09d-5c72a63b3806",
-      "name": "Send coupon email"
+      "position": [
+        660,
+        0
+      ],
+      "id": "1febb977-52a1-4dc7-8305-2acd2232e548",
+      "name": "Send voucher email",
+      "webhookId": "99ceedc3-5e9e-45a6-af54-17cec4700d91"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyHour"
+            }
+          ]
+        },
+        "startingId": 7
+      },
+      "type": "CUSTOM.prestashopTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "13f490eb-2237-4ccd-9f46-42f2d42d3352",
+      "name": "New customer created"
     },
     {
       "parameters": {
         "operation": "create",
         "base": {
+          "__rl": true,
           "value": "appKtyg1b275qW2eY",
-          "mode": "list"
+          "mode": "list",
+          "cachedResultName": "ExpertoPrestashop",
+          "cachedResultUrl": "https://airtable.com/appKtyg1b275qW2eY"
         },
         "table": {
+          "__rl": true,
           "value": "tbl0qvikQf9Nl93qX",
-          "mode": "list"
+          "mode": "list",
+          "cachedResultName": "Customers",
+          "cachedResultUrl": "https://airtable.com/appKtyg1b275qW2eY/tbl0qvikQf9Nl93qX"
         },
         "columns": {
           "mappingMode": "defineBelow",
@@ -91,37 +120,148 @@
             "lastname": "={{ $('Get customer details').item.json.customer.lastname }}",
             "email": "={{ $('Get customer details').item.json.customer.email }}",
             "birthday": "={{ $('Get customer details').item.json.customer.birthday }}",
-            "voucher": "={{ $('Create discount coupon').item.json.cart_rule.code }}"
+            "voucher": "={{ $('New customer created').item.json.cart_rule.code }}"
           },
           "matchingColumns": [],
-          "schema": []
+          "schema": [
+            {
+              "id": "firstname",
+              "displayName": "firstname",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "lastname",
+              "displayName": "lastname",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Pedidos",
+              "displayName": "Pedidos",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "birthday",
+              "displayName": "birthday",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "voucher",
+              "displayName": "voucher",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
         },
         "options": {}
       },
       "type": "n8n-nodes-base.airtable",
       "typeVersion": 2.1,
-      "position": [880, 0],
-      "id": "5e23e513-8d0b-4793-a79f-59d9c8e36045",
-      "name": "Register coupon"
+      "position": [
+        880,
+        0
+      ],
+      "id": "1cde6de1-e76c-4eef-9872-e021fa00884c",
+      "name": "Register voucher info"
     }
   ],
+  "pinData": {},
   "connections": {
+    "Send voucher email": {
+      "main": [
+        [
+          {
+            "node": "Register voucher info",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
     "Get customer details": {
-      "main": [[{ "node": "Create discount coupon", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Create discount",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create discount": {
+      "main": [
+        [
+          {
+            "node": "Send voucher email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "New customer created": {
-      "main": [[{ "node": "Get customer details", "type": "main", "index": 0 }]]
-    },
-    "Create discount coupon": {
-      "main": [[{ "node": "Send coupon email", "type": "main", "index": 0 }]]
-    },
-    "Send coupon email": {
-      "main": [[{ "node": "Register coupon", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Get customer details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": false,
-  "settings": { "executionOrder": "v1" },
-  "versionId": "cc5cfbd6-ef03-4939-9727-2c357f8c2b00",
-  "id": "r03erUjrFZnCuxUz",
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "af4f3270-36cf-43df-b23b-e3ff02227083",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a795f7726a824521e86496106d8b0ba53f3697f1774472d63e782a41351897f0"
+  },
+  "id": "PPiwSH9J9KNubvlY",
   "tags": []
 }

@@ -1,0 +1,100 @@
+{
+  "name": "Notify New Orders in Slack",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "startingId": 1
+      },
+      "type": "CUSTOM.prestashopTrigger",
+      "typeVersion": 1,
+      "position": [0, 0],
+      "name": "New order created"
+    },
+    {
+      "parameters": {
+        "channel": "#sales",
+        "text": "=New order received!\nCustomer: {{$json.order.customer.firstname}} {{$json.order.customer.lastname}}\nTotal: {{$json.order.total_paid}}\nPayment: {{$json.order.payment}}"
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 1,
+      "position": [240, 0],
+      "name": "Notify sales channel"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [],
+          "number": [
+            {
+              "value1": "={{$json.order.total_paid}}",
+              "operation": "larger",
+              "value2": 1000
+            }
+          ],
+          "string": []
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [460, 0],
+      "name": "Check high-value order"
+    },
+    {
+      "parameters": {
+        "channel": "#finance",
+        "text": "=High-value order alert!\nCustomer: {{$json.order.customer.firstname}} {{$json.order.customer.lastname}}\nTotal: {{$json.order.total_paid}}\nPayment: {{$json.order.payment}}"
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 1,
+      "position": [680, -100],
+      "name": "Notify finance team"
+    }
+  ],
+  "connections": {
+    "New order created": {
+      "main": [
+        [
+          {
+            "node": "Notify sales channel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify sales channel": {
+      "main": [
+        [
+          {
+            "node": "Check high-value order",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check high-value order": {
+      "main": [
+        [
+          {
+            "node": "Notify finance team",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
