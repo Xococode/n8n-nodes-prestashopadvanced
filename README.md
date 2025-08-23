@@ -1,118 +1,131 @@
 # n8n-nodes-prestashopadvanced
 
-This is an n8n community node. It lets you integrate [PrestaShop](https://www.prestashop.com/) Webservice/API in your n8n workflows.
+Este es un nodo de la comunidad de **n8n**. Te permite integrar el [Webservice/API de PrestaShop](https://www.prestashop.com/) en tus flujos de trabajo de n8n.
 
-It supports both **actions** (managing main resources) and **triggers** (listening for new entities created in PrestaShop).
+Es compatible tanto con **acciones** (gestionar los recursos principales) como con **disparadores** (escuchar nuevas entidades creadas en PrestaShop).
 
-[n8n](https://n8n.io/) is a [fair-code licensed](https://docs.n8n.io/reference/license/) workflow automation platform.
+[n8n](https://n8n.io/) es una plataforma de automatización de flujos de trabajo con [licencia fair-code](https://docs.n8n.io/reference/license/).
 
-[Installation](#installation)
-[Operations](#operations)  
-[Credentials](#credentials)
-[Compatibility](#compatibility)  
-[Usage](#usage)
-[Resources](#resources) 
+[Instalación](#instalación)  
+[Operaciones](#operaciones)  
+[Credenciales](#credenciales)  
+[Compatibilidad](#compatibilidad)  
+[Uso](#uso)  
+[Recursos](#recursos)  
 
-## Installation
+---
 
-Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes/installation/) in the n8n community nodes documentation.
+## Instalación
 
-npm Package Name: **n8n-nodes-prestashopadvanced**
+Sigue la [guía de instalación](https://docs.n8n.io/integrations/community-nodes/installation/) en la documentación de nodos comunitarios de n8n.
 
-## Operations
+Nombre del paquete npm: **n8n-nodes-prestashopadvanced**
 
-#### Cart Rule (Voucher)
-- Create a cart rule
-- Delete a cart rule
-- Get a cart rule
-- Get all specific prices (allowing filtering and sorting by multiple fields)
+---
 
-#### Customers
-- Create a customer
-- Update a customer (only the specified attributes)
-- Delete a customer
-- Get a customer
-- Get all customers (allowing filtering and sorting by multiple fields)
+## Operaciones
 
-#### Orders
-- Get an order
-- Get all orders (allowing filtering and sorting by multiple fields)
-- Delete an order
-- Change order state
-- Set order internal note
-- Set order shipping number
+#### Reglas de carrito (Voucher)
+- Crear una regla de carrito
+- Eliminar una regla de carrito
+- Obtener una regla de carrito
+- Obtener todos los precios específicos (permitiendo filtrar y ordenar por múltiples campos)
 
-#### Products
-- Create a product
-- Update a product (only the specified attributes)
-- Update a product stock (set quantity)
-- Delete a product
-- Get a product
-- Get all products (allowing filtering and sorting by multiple fields)
+#### Clientes
+- Crear un cliente
+- Actualizar un cliente (solo los atributos especificados)
+- Eliminar un cliente
+- Obtener un cliente
+- Obtener todos los clientes (permitiendo filtrar y ordenar por múltiples campos)
 
-#### Specific Prices
-- Create a specific price
-- Update a specific price (only the specified attributes)
-- Delete a specific price
-- Get a specific price
-- Get all specific prices (allowing filtering and sorting by multiple fields)
+#### Pedidos
+- Obtener un pedido
+- Obtener todos los pedidos (permitiendo filtrar y ordenar por múltiples campos)
+- Eliminar un pedido
+- Cambiar el estado de un pedido
+- Establecer una nota interna en un pedido
+- Establecer el número de envío de un pedido
 
-### Trigger Events
-- Address created
-- Carrier created
-- Cart Rule created
-- Cart created
-- Category created
-- Combination created
-- Customer Message created
-- Customer Thread created
-- Customer created
-- Employee created
-- Manufacturer created
-- Message created
-- Order Carrier created
-- Order Detail created
-- Order History created
-- Order Payment created
-- Order created
-- Product created
-- Specific Price Rule created
-- Specific Price created
-- Stock Available created
-- Store created
-- Supplier created
-- Tag created
+#### Productos
+- Crear un producto
+- Actualizar un producto (solo los atributos especificados)
+- Actualizar el stock de un producto (establecer cantidad)
+- Eliminar un producto
+- Obtener un producto
+- Obtener todos los productos (permitiendo filtrar y ordenar por múltiples campos)
 
-## Credentials
+#### Precios específicos
+- Crear un precio específico
+- Actualizar un precio específico (solo los atributos especificados)
+- Eliminar un precio específico
+- Obtener un precio específico
+- Obtener todos los precios específicos (permitiendo filtrar y ordenar por múltiples campos)
 
-You need a **PrestaShop API Key** and the **base URL** of your store.
+---
 
-1. In your PrestaShop back office, go to **Advanced Parameters → Webservice**.
-2. Enable the webservice and generate a key.
-3. Use this key and your store URL in the node credentials in n8n.
+### Eventos de disparo (Triggers)
+- Dirección creada  
+- Transportista creado  
+- Regla de carrito creada  
+- Carrito creado  
+- Categoría creada  
+- Combinación creada  
+- Mensaje de cliente creado  
+- Hilo de cliente creado  
+- Cliente creado  
+- Empleado creado  
+- Fabricante creado  
+- Mensaje creado  
+- Transportista de pedido creado  
+- Detalle de pedido creado  
+- Historial de pedido creado  
+- Pago de pedido creado  
+- Pedido creado  
+- Producto creado  
+- Regla de precio específico creada  
+- Precio específico creado  
+- Stock disponible creado  
+- Tienda creada  
+- Proveedor creado  
+- Etiqueta creada  
 
-## Compatibility
+---
 
-- Minimum n8n version: **1.0.0**
-- Tested with:
-  - PrestaShop **1.7.x**
-  - PrestaShop **8.x**
-  - PrestaShop **9.x**
+## Credenciales
 
-## Usage
+Necesitas una **Clave API de PrestaShop** y la **URL base** de tu tienda.
 
-1. Add the **PrestaShop** node to your workflow.
-2. Configure credentials.
-3. Choose a resource and operation:
-   - `Customer`, `Order`, `Product`, `Cart Rules`, `Specific Prices`
-   - For triggers, select one of the available events.
-4. Connect the node with other nodes in your automation.
+1. En el back office de PrestaShop, ve a **Parámetros avanzados → Webservice**.  
+2. Activa el webservice y genera una clave.  
+3. Usa esta clave y la URL de tu tienda en las credenciales del nodo en n8n.  
 
-**For ready-to-use workflow examples, [CHECK THIS FOLDER](/examples/).**
+---
 
-## Resources
+## Compatibilidad
 
-* [PrestaShop + n8n workflow examples](/examples/)
-* [n8n community nodes documentation](https://docs.n8n.io/integrations/#community-nodes)
-* [PrestaShop webservice documentation](https://devdocs.prestashop-project.org/9/webservice/)
+- Versión mínima de n8n: **1.0.0**  
+- Probado con:  
+  - PrestaShop **1.7.x**  
+  - PrestaShop **8.x**  
+  - PrestaShop **9.x**  
 
+---
+
+## Uso
+
+1. Añade el nodo **PrestaShop** a tu flujo de trabajo.  
+2. Configura las credenciales.  
+3. Elige un recurso y operación:  
+   - `Cliente`, `Pedido`, `Producto`, `Reglas de carrito`, `Precios específicos`  
+   - Para disparadores, selecciona uno de los eventos disponibles.  
+4. Conecta el nodo con otros nodos en tu automatización.  
+
+**Para ejemplos de flujos listos para usar, [REVISA ESTA CARPETA](/examples/).**
+
+---
+
+## Recursos
+
+* [Ejemplos de flujos PrestaShop + n8n](/examples/)  
+* [Documentación de nodos comunitarios de n8n](https://docs.n8n.io/integrations/#community-nodes)  
+* [Documentación del webservice de PrestaShop](https://devdocs.prestashop-project.org/9/webservice/)  
