@@ -1,6 +1,7 @@
 # n8n-nodes-prestashopadvanced
 
-![PrestaShop + n8n](https://raw.githubusercontent.com/Xococode/n8n-nodes-prestashopadvanced/main/prestashop-n8n-automatiza-tu-tienda.webp)
+![¡PrestaShop llega a n8n!](https://raw.githubusercontent.com/Xococode/n8n-nodes-prestashopadvanced/master/prestashop-n8n-automatiza-tu-tienda.webp)
+
 
 
 Este es un nodo de la comunidad de **n8n**. Te permite integrar el [Webservice/API de PrestaShop](https://www.prestashop.com/) en tus flujos de trabajo de n8n.
